@@ -1,0 +1,42 @@
+<template>
+  <style>
+    #root { position: relative; width: 1920px; height: 1080px; overflow: hidden; container-type: size; }
+    #root * { box-sizing: border-box; }
+    .f04-ground { position: absolute; inset: 0; background: #FFFFFF; overflow: hidden; }
+    .f04-grain { position: absolute; inset: 0; opacity: .38; background-image: repeating-linear-gradient(45deg, transparent 0 20px, rgba(255,92,0,.045) 20px 22px); }
+    .f04-window { position: absolute; left: 269px; top: 108px; width: 1382px; height: 778px; border: 3px solid rgba(36,26,18,.26); border-radius: 12px; box-shadow: 0 28px 70px rgba(36,26,18,.18); pointer-events: none; }
+    .f04-window::before { content: ""; position: absolute; inset: -12px; border: 1px solid rgba(255,92,0,.28); border-radius: 18px; }
+    .f04-label { position: absolute; left: 96px; top: 70px; color: #241A12; font: 700 18px/1 monospace; letter-spacing: 4px; }
+    .f04-corner { position: absolute; right: 96px; top: 66px; color: #FF5C00; font: 800 42px/1 sans-serif; letter-spacing: 2px; }
+    .f04-chip { position: absolute; left: 305px; top: 782px; height: 72px; padding: 0 30px; display: flex; align-items: center; gap: 16px; background: #241A12; color: #FFFFFF; font: 800 27px/1 sans-serif; letter-spacing: 2px; text-transform: uppercase; transform-origin: 0% 100%; white-space: nowrap; }
+    .f04-dot { width: 16px; height: 16px; border-radius: 50%; background: #FF5C00; flex: 0 0 auto; }
+    .f04-word { display: inline-block; color: #FF5C00; }
+    .f04-video-placeholder { position: absolute; left: 269px; top: 108px; width: 1382px; height: 778px; }
+  </style>
+  <div id="root" data-composition-id="04-demo-posting" data-start="0" data-duration="10" data-width="1920" data-height="1080">
+    <div class="clip f04-ground" data-start="0" data-duration="10" data-track-index="0"><div class="f04-grain" data-layout-ignore></div></div>
+    <video id="f04-video" class="clip f04-video-placeholder" src="assets/clip-guestbook.mp4" muted playsinline data-frame-video="approved" data-frame-video-x="269" data-frame-video-y="108" data-frame-video-width="1382" data-frame-video-height="778" data-frame-video-fit="cover" data-frame-video-trim-start="3.2" data-start="0" data-duration="10" data-track-index="1"></video>
+    <div class="clip" data-start="0" data-duration="10" data-track-index="2">
+      <div class="f04-label">LIVE DEMO / 04</div><div class="f04-corner">POST</div><div class="f04-window"></div>
+      <div id="f04-chip-a" class="f04-chip"><span class="f04-dot"></span><span>POSTING UNLOCKS IN PERSON</span></div>
+      <div id="f04-chip-b" class="f04-chip"><span class="f04-dot"></span><span>…AND LANDS <span id="f04-instantly" class="f04-word">INSTANTLY</span></span></div>
+    </div>
+  </div>
+  <script>
+    window.__timelines = window.__timelines || {};
+    const f04tl = gsap.timeline({ paused: true });
+    f04tl.set("#f04-chip-b", { autoAlpha: 0 }, 0);
+    f04tl.fromTo("#f04-chip-a", { y: 46, opacity: 0 }, { y: 0, opacity: 1, duration: .5, ease: "power3.out" }, .08);
+    f04tl.fromTo(".f04-label", { x: -24, opacity: 0 }, { x: 0, opacity: 1, duration: .45, ease: "power2.out" }, .12);
+    f04tl.fromTo(".f04-corner", { x: 24, opacity: 0 }, { x: 0, opacity: 1, duration: .45, ease: "power2.out" }, .18);
+    f04tl.fromTo(".f04-window", { scale: 1 }, { scale: 1.035, duration: 1.7, ease: "power3.inOut", immediateRender: false }, 1.0);
+    f04tl.to(".f04-window", { scale: 1, duration: 1.0, ease: "power3.out" }, 2.7);
+    f04tl.to("#f04-chip-a", { y: -34, opacity: 0, duration: .28, ease: "power3.in" }, 7.48);
+    f04tl.fromTo("#f04-chip-b", { y: 46, autoAlpha: 0 }, { y: 0, autoAlpha: 1, duration: .42, ease: "power3.out", immediateRender: false }, 7.56);
+    const f04Glow = { t: 0 };
+    const f04Word = document.getElementById("f04-instantly");
+    f04tl.to(f04Glow, { t: 1, duration: .5, ease: "none", onUpdate: () => { const e = f04Glow.t; f04Word.style.textShadow = `0 0 ${36 * e}px rgba(255,92,0,${.7 * e})`; f04Word.style.transform = `scale(${1 + .16 * e})`; } }, 7.8);
+    f04tl.to(f04Glow, { t: .18, duration: .42, ease: "none", onUpdate: () => { const e = f04Glow.t; f04Word.style.textShadow = `0 0 ${36 * e}px rgba(255,92,0,${.7 * e})`; f04Word.style.transform = `scale(${1 + .16 * e})`; } }, 8.3);
+    window.__timelines["04-demo-posting"] = f04tl;
+  </script>
+</template>

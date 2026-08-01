@@ -1,0 +1,8 @@
+[div] LIVE
+[span] 9 Claude Lane · San Francisco
+[h1] CORGI
+[span] CHAT.
+[p] The neighborhood chat room you can read anywhere and join only at the cafe.
+[a] Join the chat
+[p] Open 24/7 · posting unlocks in person
+[span] Built on Zo

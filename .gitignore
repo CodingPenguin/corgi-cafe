@@ -1,0 +1,20 @@
+.DS_Store
+node_modules/
+
+# Local exports and accidental browser output
+--full-page
+videos/*-local-handoff.tar.gz
+
+# HyperFrames generated and recoverable output
+videos/**/renders/work-*/
+videos/**/snapshots/
+videos/**/assets/bgm/*.log
+
+# Duplicate copies of footage retained by capture/staging workflows
+videos/**/capture/assets/clip-*.mp4
+videos/**/footage/clip-*.mp4
+
+# Local secrets
+.env
+.env.*
+!.env.example

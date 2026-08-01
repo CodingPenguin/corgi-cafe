@@ -1,0 +1,45 @@
+<template>
+  <style>
+    #root { position: relative; width: 1920px; height: 1080px; overflow: hidden; container-type: size; }
+    #root * { box-sizing: border-box; }
+    .f05-ground { position: absolute; inset: 0; background: #FFFFFF; overflow: hidden; }
+    .f05-hatch { position: absolute; inset: 0; opacity: .5; background-image: repeating-linear-gradient(45deg, transparent 0 22px, rgba(255,92,0,.045) 22px 24px); }
+    .f05-stage { position: absolute; inset: 0; perspective: 1700px; padding: 94px 96px 210px; }
+    .f05-kicker { color: #FF5C00; font: 700 19px/1 monospace; letter-spacing: 5px; }
+    .f05-title { color: #241A12; font: 800 70px/.95 sans-serif; letter-spacing: 3px; text-transform: uppercase; margin-top: 20px; }
+    .f05-cards { position: absolute; left: 150px; top: 286px; width: 1620px; height: 510px; display: flex; gap: 80px; transform-style: preserve-3d; }
+    .f05-card { position: relative; width: 770px; height: 510px; padding: 66px; display: flex; flex-direction: column; justify-content: space-between; transform-style: preserve-3d; border-top: 6px solid #FF5C00; overflow: hidden; }
+    .f05-left { background: #FFFFFF; color: #241A12; border-left: 3px solid #241A12; border-right: 3px solid #241A12; border-bottom: 3px solid #241A12; }
+    .f05-right { background: #FF5C00; color: #FFFFFF; border-color: #241A12; }
+    .f05-label { font: 700 18px/1 monospace; letter-spacing: 4px; text-transform: uppercase; }
+    .f05-head { max-width: 590px; font: 800 72px/.96 sans-serif; letter-spacing: 2px; text-transform: uppercase; }
+    .f05-motif { position: absolute; right: 48px; top: 44px; width: 130px; height: 130px; display: grid; place-items: center; }
+    .f05-globe { border: 5px solid #FF5C00; border-radius: 50%; }
+    .f05-globe::before,.f05-globe::after { content: ""; position: absolute; background: #FF5C00; }
+    .f05-globe::before { width: 5px; height: 100%; left: 62px; top: 0; }
+    .f05-globe::after { height: 5px; width: 100%; left: 0; top: 62px; }
+    .f05-pin { background: #241A12; border-radius: 50% 50% 50% 0; width: 110px; height: 110px; rotate: -45deg; }
+    .f05-pin img { width: 66px; height: 66px; rotate: 45deg; filter: brightness(0) invert(1); margin: 22px; }
+    .f05-badge { position: absolute; left: 50%; top: 708px; width: 620px; height: 82px; margin-left: -310px; display: grid; place-items: center; background: #241A12; color: #FFFFFF; border: 4px solid #FFFFFF; font: 800 24px/1 sans-serif; letter-spacing: 2px; text-transform: uppercase; transform-origin: 50% 50%; z-index: 4; }
+  </style>
+  <div id="root" data-composition-id="05-the-rule" data-start="0" data-duration="5" data-width="1920" data-height="1080">
+    <div class="clip f05-ground" data-start="0" data-duration="5" data-track-index="0"><div class="f05-hatch" data-layout-ignore></div></div>
+    <div class="clip f05-stage" data-start="0" data-duration="5" data-track-index="1">
+      <div class="f05-kicker">THE RULE / ONE PLACE</div><div class="f05-title">WATCH WIDE. SIGN LOCAL.</div>
+      <div class="f05-cards">
+        <div id="f05-left" class="f05-card f05-left"><div class="f05-motif f05-globe" data-layout-ignore></div><div class="f05-label">READ</div><div class="f05-head">FROM<br>ANYWHERE</div></div>
+        <div id="f05-right" class="f05-card f05-right"><div class="f05-motif f05-pin"><img src="assets/favicon.svg" alt="Paw pin" /></div><div class="f05-label">SIGN</div><div class="f05-head">FROM THE<br>CAFE</div></div>
+      </div>
+      <div id="f05-badge" class="f05-badge">NO ACCOUNTS. NO FEED. JUST HERE.</div>
+    </div>
+  </div>
+  <script>
+    window.__timelines = window.__timelines || {};
+    const f05tl = gsap.timeline({ paused: true });
+    f05tl.fromTo("#f05-left", { x: -420, rotateY: 24, opacity: 0 }, { x: 0, rotateY: 13, opacity: 1, duration: 1.05, ease: "power3.out" }, .05);
+    f05tl.fromTo(".f05-kicker,.f05-title", { y: -24, opacity: 0 }, { y: 0, opacity: 1, duration: .55, ease: "power2.out", stagger: .12 }, .34);
+    f05tl.fromTo("#f05-right", { x: 420, rotateY: -24, opacity: 0 }, { x: 0, rotateY: -13, opacity: 1, duration: 1.05, ease: "power3.out" }, 1.4);
+    f05tl.fromTo("#f05-badge", { scale: 0, opacity: 0, rotation: -4 }, { scale: 1, opacity: 1, rotation: 0, duration: .68, ease: "back.out(1.6)" }, 2.82);
+    window.__timelines["05-the-rule"] = f05tl;
+  </script>
+</template>

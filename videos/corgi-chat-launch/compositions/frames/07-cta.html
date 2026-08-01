@@ -1,0 +1,47 @@
+<template>
+  <style>
+    #root { position: relative; width: 1920px; height: 1080px; overflow: hidden; container-type: size; }
+    #root * { box-sizing: border-box; }
+    .f07-ground { position: absolute; inset: 0; background: #FF5C00; overflow: hidden; }
+    .f07-hatch { position: absolute; inset: 0; opacity: .55; background-image: repeating-linear-gradient(45deg, transparent 0 24px, rgba(36,26,18,.06) 24px 27px); }
+    .f07-art-panel { position: absolute; right: 0; top: 0; width: 48%; height: 83%; overflow: hidden; }
+    .f07-art { width: 181%; height: 100%; object-fit: cover; object-position: right center; margin-left: -81%; }
+    .f07-art-wash { position: absolute; inset: 0; background: linear-gradient(90deg, #FF5C00 0%, rgba(255,92,0,.3) 32%, rgba(255,92,0,0) 64%); }
+    .f07-streak { position: absolute; right: 250px; top: 430px; width: 620px; height: 12px; background: #FFFFFF; opacity: .25; }
+    .f07-stage { position: absolute; inset: 0; padding: 132px 96px 210px; display: flex; flex-direction: column; justify-content: center; align-items: flex-start; }
+    .f07-kicker { color: #241A12; font: 700 19px/1 monospace; letter-spacing: 5px; margin-bottom: 24px; }
+    .f07-title { width: 1030px; color: #241A12; font: 800 152px/.88 sans-serif; letter-spacing: 6px; text-transform: uppercase; }
+    .f07-title span { display: inline-block; }
+    .f07-url { margin-top: 34px; padding: 20px 28px; background: #FFFFFF; color: #241A12; border: 4px solid #241A12; font: 700 31px/1 monospace; white-space: nowrap; transform-origin: 0% 50%; }
+    .f07-address { margin-top: 20px; color: #241A12; font: 700 23px/1 monospace; letter-spacing: 2px; }
+    .f07-stamp { position: absolute; left: 820px; top: 660px; width: 112px; height: 112px; border: 4px solid #241A12; border-radius: 50%; display: grid; place-items: center; background: #FF5C00; }
+    .f07-stamp img { width: 76px; height: 76px; object-fit: contain; }
+    .f07-ring { position: absolute; inset: 8px; border: 3px solid #241A12; border-radius: 50%; fill: none; }
+  </style>
+  <div id="root" data-composition-id="07-cta" data-start="0" data-duration="5" data-width="1920" data-height="1080">
+    <div class="clip f07-ground" data-start="0" data-duration="5" data-track-index="0"><div class="f07-hatch" data-layout-ignore></div><div class="f07-art-panel"><img id="f07-art" class="f07-art" src="assets/corgichat.webp" alt="Flying corgi" /><div class="f07-art-wash"></div></div><div id="f07-streak" class="f07-streak" data-layout-ignore></div></div>
+    <div class="clip f07-stage" data-start="0" data-duration="5" data-track-index="1">
+      <div class="f07-kicker">THE CAFE WALL IS LIVE</div>
+      <div class="f07-title"><span>CORGI</span> <span>CHAT.</span></div>
+      <div id="f07-url" class="f07-url">danmaruchi.zo.space/corgi</div>
+      <div id="f07-address" class="f07-address">CORGI CAFE · 9 CLAUDE LANE</div>
+      <div id="f07-stamp" class="f07-stamp"><svg class="f07-ring" viewBox="0 0 96 96"><circle id="f07-ring-path" cx="48" cy="48" r="42" stroke="#241A12" stroke-width="4" fill="none" /></svg><img src="assets/favicon.svg" alt="Paw stamp" /></div>
+    </div>
+  </div>
+  <script>
+    window.__timelines = window.__timelines || {};
+    const f07tl = gsap.timeline({ paused: true });
+    f07tl.fromTo("#f07-art", { x: -780, opacity: 0 }, { x: 0, opacity: 1, duration: .62, ease: "power3.out" }, .05);
+    f07tl.fromTo("#f07-streak", { x: -820, scaleX: 1.8, opacity: .5 }, { x: 0, scaleX: 0, opacity: 0, duration: .62, ease: "power3.out" }, .05);
+    f07tl.fromTo(".f07-title span", { y: 84, opacity: 0 }, { y: 0, opacity: 1, duration: .62, ease: "power3.out", stagger: .16 }, 1.4);
+    f07tl.fromTo(".f07-kicker", { x: -42, opacity: 0 }, { x: 0, opacity: 1, duration: .5, ease: "power2.out" }, 1.55);
+    f07tl.fromTo("#f07-url", { scale: 0, opacity: 0, y: 20 }, { scale: 1, opacity: 1, y: 0, duration: .58, ease: "power3.out" }, 3.0);
+    f07tl.fromTo("#f07-address", { y: 22, opacity: 0 }, { y: 0, opacity: 1, duration: .5, ease: "power2.out" }, 3.38);
+    const f07ring = document.getElementById("f07-ring-path");
+    const f07len = f07ring.getTotalLength();
+    f07ring.style.strokeDasharray = `${f07len}`; f07ring.style.strokeDashoffset = `${f07len}`;
+    f07tl.fromTo("#f07-stamp", { scale: 0, opacity: 0, rotation: -8 }, { scale: 1, opacity: 1, rotation: 0, duration: .56, ease: "back.out(1.6)" }, 3.72);
+    f07tl.to(f07ring, { strokeDashoffset: 0, duration: .62, ease: "power2.out" }, 3.82);
+    window.__timelines["07-cta"] = f07tl;
+  </script>
+</template>

@@ -1,0 +1,252 @@
+<template>
+  <style>
+    #root {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      container-type: size;
+    }
+
+    #root * {
+      box-sizing: border-box;
+    }
+
+    [class~="01-hook-ground"] {
+      position: absolute;
+      inset: 0;
+      overflow: hidden;
+      background: #241a12;
+    }
+
+
+    [class~="01-hook-watermark"] {
+      position: absolute;
+      top: 10cqh;
+      right: 8cqw;
+      width: 27cqw;
+      height: 27cqw;
+      opacity: 0.045;
+      transform: rotate(13deg);
+    }
+
+    [class~="01-hook-pad"],
+    [class~="01-hook-toe"] {
+      position: absolute;
+      display: block;
+      background: #ffffff;
+      border-radius: 50%;
+    }
+
+    [class~="01-hook-pad"] {
+      left: 7.2cqw;
+      top: 10.4cqw;
+      width: 13.2cqw;
+      height: 11.4cqw;
+    }
+
+    [class~="01-hook-toe-a"] {
+      left: 2.2cqw;
+      top: 5.6cqw;
+      width: 5.4cqw;
+      height: 6.7cqw;
+      transform: rotate(-24deg);
+    }
+
+    [class~="01-hook-toe-b"] {
+      left: 7.4cqw;
+      top: 1.2cqw;
+      width: 5.2cqw;
+      height: 6.5cqw;
+      transform: rotate(-8deg);
+    }
+
+    [class~="01-hook-toe-c"] {
+      left: 13.4cqw;
+      top: 1.1cqw;
+      width: 5.2cqw;
+      height: 6.5cqw;
+      transform: rotate(8deg);
+    }
+
+    [class~="01-hook-toe-d"] {
+      left: 18.6cqw;
+      top: 5.5cqw;
+      width: 5.4cqw;
+      height: 6.7cqw;
+      transform: rotate(24deg);
+    }
+
+    [class~="01-hook-content"] {
+      position: absolute;
+      inset: 0 0 17cqh;
+      display: grid;
+      place-items: center;
+      padding: 4cqw 5cqw;
+      color: #ffffff;
+    }
+
+    [class~="01-hook-lockup"] {
+      width: 66cqw;
+      min-height: 29cqh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: flex-start;
+      line-height: 0.9;
+      text-transform: uppercase;
+      font-family: sans-serif;
+      font-weight: 700;
+      letter-spacing: 0.18cqw;
+    }
+
+    [class~="01-hook-prefix"] {
+      display: flex;
+      gap: 1.2cqw;
+      align-items: baseline;
+      white-space: nowrap;
+      font-size: 6.2cqw;
+    }
+
+    [class~="01-hook-word"] {
+      display: inline-block;
+    }
+
+    [class~="01-hook-swap-slot"] {
+      position: relative;
+      display: block;
+      width: 66cqw;
+      height: 9.8cqw;
+      margin-top: 1.1cqw;
+      font-size: 8.3cqw;
+      letter-spacing: 0.28cqw;
+      white-space: nowrap;
+    }
+
+    [class~="01-hook-everywhere"],
+    [class~="01-hook-address"] {
+      position: absolute;
+      left: 0;
+      top: 0;
+      display: inline-block;
+    }
+
+    [class~="01-hook-address"] {
+      color: #ff5c00;
+      opacity: 0;
+    }
+
+    [class~="01-hook-address-wrap"] {
+      position: relative;
+      display: inline-block;
+    }
+
+    [class~="01-hook-underline"] {
+      position: absolute;
+      left: 0.3cqw;
+      bottom: -1.1cqw;
+      width: 36.5cqw;
+      height: 1.7cqw;
+      overflow: visible;
+    }
+  </style>
+
+  <div id="root" data-composition-id="01-hook" data-start="0" data-duration="5" data-width="1920" data-height="1080">
+    <div id="hf-01-hook-ground" class="clip 01-hook-ground" data-start="0" data-duration="5" data-track-index="0">
+      <div class="01-hook-watermark" aria-hidden="true">
+        <span class="01-hook-pad"></span>
+        <span class="01-hook-toe 01-hook-toe-a"></span>
+        <span class="01-hook-toe 01-hook-toe-b"></span>
+        <span class="01-hook-toe 01-hook-toe-c"></span>
+        <span class="01-hook-toe 01-hook-toe-d"></span>
+      </div>
+    </div>
+
+    <div id="hf-01-hook-content" class="clip 01-hook-content" data-start="0" data-duration="5" data-track-index="1">
+      <div id="hf-01-hook-settled" class="01-hook-lockup">
+        <div class="01-hook-prefix" aria-label="every chat is">
+          <span id="hf-01-hook-word-every" class="01-hook-word">every</span>
+          <span id="hf-01-hook-word-chat" class="01-hook-word">chat</span>
+          <span id="hf-01-hook-word-is" class="01-hook-word">is</span>
+        </div>
+        <div class="01-hook-swap-slot">
+          <span id="hf-01-hook-everywhere" class="01-hook-everywhere">everywhere.</span>
+          <span id="hf-01-hook-address" class="01-hook-address">
+            <span class="01-hook-address-wrap">
+              an address.
+              <svg class="01-hook-underline" viewBox="0 0 700 30" preserveAspectRatio="none" aria-hidden="true">
+                <path
+                  id="hf-01-hook-underline-path"
+                  d="M4 19 C92 5 176 25 263 13 C350 1 444 24 526 11 C591 1 642 17 696 9"
+                  fill="none"
+                  stroke="#ff5c00"
+                  stroke-width="10"
+                  stroke-linecap="square"
+                  stroke-dasharray="710"
+                  stroke-dashoffset="710"
+                />
+              </svg>
+            </span>
+          </span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    (() => {
+    window.__timelines = window.__timelines || {};
+
+    const frame01Timeline = gsap.timeline({ paused: true });
+    const frame01Words = [
+      document.getElementById("hf-01-hook-word-every"),
+      document.getElementById("hf-01-hook-word-chat"),
+      document.getElementById("hf-01-hook-word-is"),
+      document.getElementById("hf-01-hook-everywhere"),
+    ];
+    const frame01Everywhere = document.getElementById("hf-01-hook-everywhere");
+    const frame01Address = document.getElementById("hf-01-hook-address");
+    const frame01Underline = document.getElementById("hf-01-hook-underline-path");
+    const frame01Settled = document.getElementById("hf-01-hook-settled");
+
+    frame01Timeline.fromTo(
+      frame01Words,
+      { opacity: 0, y: 72 },
+      { opacity: 1, y: 0, duration: 0.72, stagger: 0.14, ease: "power3.out" },
+      0.08,
+    );
+
+    frame01Timeline.set(frame01Everywhere, { opacity: 0 }, 1.6);
+    frame01Timeline.set(frame01Address, { opacity: 1 }, 1.6);
+    frame01Timeline.fromTo(
+      frame01Address,
+      { scale: 0.985 },
+      { scale: 1, duration: 0.34, ease: "power3.out" },
+      1.6,
+    );
+
+    frame01Timeline.to(
+      frame01Underline,
+      { strokeDashoffset: 0, duration: 0.72, ease: "power2.inOut" },
+      3.0,
+    );
+
+    const frame01Jitter = { phase: 0 };
+    frame01Timeline.to(
+      frame01Jitter,
+      {
+        phase: Math.PI * 4,
+        duration: 1.25,
+        ease: "none",
+        onUpdate: () => {
+          const offset = Math.sin(frame01Jitter.phase) * 2;
+          frame01Settled.style.transform = `translate3d(0, ${offset}px, 0)`;
+        },
+      },
+      3.75,
+    );
+
+    window.__timelines["01-hook"] = frame01Timeline;
+    })();
+  </script>
+</template>

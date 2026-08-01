@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "preferences": {
+    "destination": {
+      "value": "x-feed",
+      "confirmed_in": [
+        "corgi-chat-launch"
+      ],
+      "updated_at": "2026-08-01T20:25:27.146Z"
+    },
+    "aspect": {
+      "value": "1920x1080",
+      "confirmed_in": [
+        "corgi-chat-launch"
+      ],
+      "updated_at": "2026-08-01T20:25:27.187Z"
+    },
+    "language": {
+      "value": "en",
+      "confirmed_in": [
+        "corgi-chat-launch"
+      ],
+      "updated_at": "2026-08-01T20:25:27.227Z"
+    },
+    "flow": {
+      "value": "automation",
+      "confirmed_in": [
+        "corgi-chat-launch"
+      ],
+      "updated_at": "2026-08-01T20:25:27.270Z"
+    },
+    "storyboard": {
+      "value": "no",
+      "confirmed_in": [
+        "corgi-chat-launch"
+      ],
+      "updated_at": "2026-08-01T20:25:27.312Z"
+    },
+    "style_preset.product-launch-video": {
+      "value": "coral",
+      "confirmed_in": [
+        "corgi-chat-launch"
+      ],
+      "updated_at": "2026-08-01T20:31:28.508Z"
+    }
+  },
+  "sightings": {}
+}

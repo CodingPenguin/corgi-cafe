@@ -1,0 +1,41 @@
+<template>
+  <style>
+    #root { position: relative; width: 1920px; height: 1080px; overflow: hidden; container-type: size; }
+    #root * { box-sizing: border-box; }
+    .f06-ground { position: absolute; inset: 0; background: #241A12; overflow: hidden; }
+    .f06-hatch { position: absolute; inset: 0; opacity: .11; background-image: repeating-linear-gradient(-45deg, transparent 0 26px, rgba(255,92,0,.14) 26px 29px); }
+    .f06-paw { position: absolute; left: 1340px; top: 120px; width: 380px; height: 380px; opacity: .08; }
+    .f06-paw i { position: absolute; display: block; background: #FF5C00; border-radius: 50%; }
+    .f06-paw i:nth-child(1) { width: 180px; height: 145px; left: 100px; top: 180px; }
+    .f06-paw i:nth-child(2) { width: 78px; height: 100px; left: 30px; top: 86px; }
+    .f06-paw i:nth-child(3) { width: 78px; height: 100px; left: 112px; top: 30px; }
+    .f06-paw i:nth-child(4) { width: 78px; height: 100px; left: 200px; top: 30px; }
+    .f06-paw i:nth-child(5) { width: 78px; height: 100px; left: 278px; top: 91px; }
+    .f06-stage { position: absolute; inset: 0; display: grid; place-items: center; padding-bottom: 130px; }
+    .f06-copy { width: 1060px; text-align: center; text-transform: uppercase; font-family: sans-serif; font-weight: 800; }
+    .f06-beats { color: #FFFFFF; font-size: 148px; line-height: .9; letter-spacing: 5px; }
+    .f06-beat { display: block; }
+    .f06-line { width: 180px; height: 8px; margin: 42px auto 32px; background: #FF5C00; }
+    .f06-tag { display: flex; justify-content: center; flex-wrap: wrap; gap: 0 20px; min-height: 80px; color: #FF5C00; font-size: 48px; line-height: 1.1; letter-spacing: 2px; }
+    .f06-tag span { display: inline-block; }
+    .f06-index { position: absolute; left: 96px; top: 80px; color: #FF5C00; font: 700 20px/1 monospace; letter-spacing: 4px; }
+  </style>
+  <div id="root" data-composition-id="06-the-twist" data-start="0" data-duration="4" data-width="1920" data-height="1080">
+    <div class="clip f06-ground" data-start="0" data-duration="4" data-track-index="0"><div class="f06-hatch" data-layout-ignore></div><div class="f06-paw" data-layout-ignore><i></i><i></i><i></i><i></i><i></i></div></div>
+    <div class="clip f06-stage" data-start="0" data-duration="4" data-track-index="1">
+      <div class="f06-index">CORGI CHAT / 24H</div>
+      <div id="f06-copy" class="f06-copy"><div class="f06-beats"><span id="f06-day" class="f06-beat">NEW DAY.</span><span id="f06-wall" class="f06-beat">NEW WALL.</span></div><div class="f06-line"></div><div class="f06-tag"><span>SAY IT</span><span>WHILE YOU’RE</span><span>HERE.</span></div></div>
+    </div>
+  </div>
+  <script>
+    window.__timelines = window.__timelines || {};
+    const f06tl = gsap.timeline({ paused: true });
+    const f06beats = [.08, .9];
+    f06tl.fromTo("#f06-day", { scale: 1.45, filter: "blur(16px)", opacity: 0 }, { scale: 1, filter: "blur(0px)", opacity: 1, duration: .5, ease: "power4.out" }, f06beats[0]);
+    f06tl.fromTo("#f06-wall", { x: -320, opacity: 0 }, { x: 0, opacity: 1, duration: .5, ease: "expo.out" }, f06beats[1]);
+    f06tl.fromTo(".f06-line", { scaleX: 0, transformOrigin: "50% 50%" }, { scaleX: 1, duration: .42, ease: "power2.out" }, 1.45);
+    f06tl.fromTo(".f06-tag span", { y: 48, opacity: 0 }, { y: 0, opacity: 1, duration: .48, ease: "power3.out", stagger: .2 }, 1.8);
+    f06tl.to("#f06-copy", { y: -2, duration: .28, ease: "sine.inOut", yoyo: true, repeat: 1 }, 3.28);
+    window.__timelines["06-the-twist"] = f06tl;
+  </script>
+</template>

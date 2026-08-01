@@ -1,0 +1,67 @@
+{
+  "typography": [
+    {
+      "role": "display",
+      "fontFamily": "ui-sans-serif",
+      "fontSize": "168px",
+      "fontWeight": "900",
+      "lineHeight": "127.68px",
+      "letterSpacing": "-14.28px",
+      "color": "#FFFFFF",
+      "sampleText": "CORGICHAT."
+    },
+    {
+      "role": "body",
+      "fontFamily": "ui-sans-serif",
+      "fontSize": "24px",
+      "fontWeight": "600",
+      "lineHeight": "33px",
+      "letterSpacing": "normal",
+      "color": "#241A12",
+      "sampleText": "The neighborhood chat room you can read anywhere and join on"
+    },
+    {
+      "role": "link",
+      "fontFamily": "ui-sans-serif",
+      "fontSize": "16px",
+      "fontWeight": "600",
+      "lineHeight": "24px",
+      "letterSpacing": "normal",
+      "color": "#241A12",
+      "sampleText": "9 Claude Ln9 Claude Lane · San Francisco"
+    }
+  ],
+  "spacing": {
+    "observed": [
+      6,
+      8,
+      12,
+      16,
+      32
+    ],
+    "baseUnit": 8
+  },
+  "radius": [],
+  "shadows": [],
+  "buttons": [],
+  "cards": [],
+  "nav": null,
+  "chips": [
+    {
+      "label": "LIVE",
+      "background": "oklab(0.999994 0.0000455678 0.0000200868 / 0.95)",
+      "color": "#241A12",
+      "padding": "8px 16px",
+      "borderRadius": "3.35544e+07px",
+      "border": "0px solid oklch(0.923 0.003 48.717)",
+      "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0.1) 0px 10px 15px -3px, rgba(0, 0, 0, 0.1) 0px 4px 6px -4px",
+      "fontSize": "12px",
+      "fontWeight": "900",
+      "height": "32px"
+    }
+  ],
+  "statCells": [],
+  "tabs": [],
+  "backgrounds": [],
+  "glass": []
+}

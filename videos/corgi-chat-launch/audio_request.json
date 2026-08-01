@@ -1,0 +1,58 @@
+{
+  "lines": [
+    {
+      "id": "01",
+      "sfx": [
+        "riser",
+        "impact-bass-1"
+      ]
+    },
+    {
+      "id": "02",
+      "sfx": [
+        "whoosh-short",
+        "impact-bass-2"
+      ]
+    },
+    {
+      "id": "03",
+      "sfx": [
+        "whoosh",
+        "click"
+      ]
+    },
+    {
+      "id": "04",
+      "sfx": [
+        "typing",
+        "pop",
+        "notification"
+      ]
+    },
+    {
+      "id": "05",
+      "sfx": [
+        "whoosh-short",
+        "pop"
+      ]
+    },
+    {
+      "id": "06",
+      "sfx": [
+        "impact-bass-1",
+        "riser"
+      ]
+    },
+    {
+      "id": "07",
+      "sfx": [
+        "whoosh-cinematic",
+        "pop",
+        "sparkle"
+      ]
+    }
+  ],
+  "bgm": {
+    "mode": "none"
+  }
+}

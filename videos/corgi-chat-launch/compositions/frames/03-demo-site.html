@@ -1,0 +1,35 @@
+<template>
+  <style>
+    #root { position: relative; width: 1920px; height: 1080px; overflow: hidden; container-type: size; }
+    #root * { box-sizing: border-box; }
+    .f03-ground { position: absolute; inset: 0; background: #FFFFFF; overflow: hidden; }
+    .f03-grain { position: absolute; inset: 0; opacity: .38; background-image: repeating-linear-gradient(45deg, transparent 0 20px, rgba(255,92,0,.045) 20px 22px); }
+    .f03-window { position: absolute; left: 269px; top: 108px; width: 1382px; height: 778px; border: 3px solid rgba(36,26,18,.26); border-radius: 12px; box-shadow: 0 28px 70px rgba(36,26,18,.18); pointer-events: none; }
+    .f03-window::before { content: ""; position: absolute; inset: -12px; border: 1px solid rgba(255,92,0,.28); border-radius: 18px; }
+    .f03-label { position: absolute; left: 96px; top: 70px; color: #241A12; font: 700 18px/1 monospace; letter-spacing: 4px; }
+    .f03-chip { position: absolute; left: 305px; top: 782px; min-width: 330px; height: 72px; padding: 0 30px; display: flex; align-items: center; gap: 16px; background: #241A12; color: #FFFFFF; font: 800 27px/1 sans-serif; letter-spacing: 2px; text-transform: uppercase; transform-origin: 0% 100%; }
+    .f03-dot { width: 16px; height: 16px; border-radius: 50%; background: #FF5C00; }
+    .f03-corner { position: absolute; right: 96px; top: 66px; color: #FF5C00; font: 800 42px/1 sans-serif; letter-spacing: 2px; }
+    .f03-video-placeholder { position: absolute; left: 269px; top: 108px; width: 1382px; height: 778px; }
+  </style>
+  <div id="root" data-composition-id="03-demo-site" data-start="0" data-duration="7" data-width="1920" data-height="1080">
+    <div class="clip f03-ground" data-start="0" data-duration="7" data-track-index="0"><div class="f03-grain" data-layout-ignore></div></div>
+    <video id="f03-video" class="clip f03-video-placeholder" src="assets/clip-landing.mp4" muted playsinline data-frame-video="approved" data-frame-video-x="269" data-frame-video-y="108" data-frame-video-width="1382" data-frame-video-height="778" data-frame-video-fit="cover" data-start="0" data-duration="7" data-track-index="1"></video>
+    <div class="clip" data-start="0" data-duration="7" data-track-index="2">
+      <div class="f03-label">LIVE DEMO / 03</div><div class="f03-corner">WATCH</div>
+      <div id="f03-window" class="f03-window"></div>
+      <div id="f03-chip" class="f03-chip"><span class="f03-dot"></span><span>ANYONE CAN WATCH</span></div>
+    </div>
+  </div>
+  <script>
+    window.__timelines = window.__timelines || {};
+    const f03tl = gsap.timeline({ paused: true });
+    f03tl.fromTo("#f03-window", { scale: .9, opacity: 0, y: 22 }, { scale: 1, opacity: 1, y: 0, duration: .65, ease: "power3.out" }, 0);
+    f03tl.fromTo(".f03-label", { x: -28, opacity: 0 }, { x: 0, opacity: 1, duration: .45, ease: "power2.out" }, .25);
+    f03tl.fromTo(".f03-corner", { x: 28, opacity: 0 }, { x: 0, opacity: 1, duration: .45, ease: "power2.out" }, .35);
+    f03tl.fromTo("#f03-window", { scale: 1 }, { scale: 1.025, duration: 2.1, ease: "power2.inOut", immediateRender: false }, 1.15);
+    f03tl.to("#f03-window", { scale: 1, duration: .9, ease: "power3.out" }, 3.25);
+    f03tl.fromTo("#f03-chip", { scale: 0, opacity: 0, y: 18 }, { scale: 1, opacity: 1, y: 0, duration: .58, ease: "power3.out" }, 5.25);
+    window.__timelines["03-demo-site"] = f03tl;
+  </script>
+</template>

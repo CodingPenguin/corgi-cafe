@@ -1,0 +1,230 @@
+<template>
+  <style>
+    #root {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      container-type: size;
+      color: #241a12;
+      font-family: sans-serif;
+    }
+
+    .hf-02-product-intro-ground,
+    .hf-02-product-intro-art {
+      position: absolute;
+      inset: 0;
+      overflow: hidden;
+    }
+
+    .hf-02-product-intro-image {
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .hf-02-product-intro-grade {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(90deg, rgba(255, 92, 0, 0.98) 0%, rgba(255, 92, 0, 0.9) 30%, rgba(255, 92, 0, 0.48) 49%, rgba(255, 92, 0, 0) 64%);
+    }
+
+    .hf-02-product-intro-stage {
+      position: absolute;
+      inset: 0;
+      display: grid;
+      grid-template-columns: 58% 42%;
+      padding: 6.9cqw 5.8cqw 17cqh 6.1cqw;
+      box-sizing: border-box;
+    }
+
+    .hf-02-product-intro-copy {
+      position: relative;
+      z-index: 2;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: flex-start;
+      width: 100%;
+      max-width: 51cqw;
+    }
+
+    .hf-02-product-intro-title {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0 1.55cqw;
+      width: 100%;
+      margin: 0;
+      font-size: 8.65cqw;
+      font-weight: 700;
+      line-height: 0.82;
+      letter-spacing: -0.36cqw;
+      text-transform: uppercase;
+      color: #241a12;
+    }
+
+    .hf-02-product-intro-title-word {
+      display: inline-block;
+    }
+
+    .hf-02-product-intro-address-row {
+      display: flex;
+      align-items: center;
+      min-height: 3.85cqw;
+      margin-top: 3.8cqw;
+      color: #241a12;
+    }
+
+    .hf-02-product-intro-paw-chip {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex: 0 0 3.35cqw;
+      width: 3.35cqw;
+      height: 3.35cqw;
+      margin-right: 1.15cqw;
+      background: #ffffff;
+      border: 0.16cqw solid #241a12;
+      border-radius: 50%;
+    }
+
+    .hf-02-product-intro-paw-chip img {
+      display: block;
+      width: 2.3cqw;
+      height: 2.3cqw;
+      object-fit: contain;
+    }
+
+    .hf-02-product-intro-terminal {
+      display: flex;
+      align-items: baseline;
+      min-width: 40.6cqw;
+      font-family: monospace;
+      font-size: 1.62cqw;
+      font-weight: 700;
+      line-height: 1.25;
+      letter-spacing: -0.05cqw;
+      white-space: pre;
+    }
+
+    .hf-02-product-intro-address {
+      white-space: pre;
+    }
+
+    .hf-02-product-intro-cursor {
+      display: inline-block;
+      width: 0.68cqw;
+      height: 1.67cqw;
+      margin-left: 0.36cqw;
+      background: #241a12;
+      opacity: 0;
+      vertical-align: -0.26cqw;
+    }
+  </style>
+
+  <div id="root" data-composition-id="02-product-intro" data-start="0" data-duration="5" data-width="1920" data-height="1080">
+    <div id="hf-02-product-intro-ground" class="clip hf-02-product-intro-ground" data-start="0" data-duration="5" data-track-index="0">
+      <div id="hf-02-product-intro-art" class="hf-02-product-intro-art">
+        <img class="hf-02-product-intro-image" src="assets/corgichat.webp" alt="A flying corgi carrying coffee over San Francisco" />
+      </div>
+    </div>
+
+    <div id="hf-02-product-intro-grade" class="clip hf-02-product-intro-grade" data-start="0" data-duration="5" data-track-index="1"></div>
+
+    <div id="hf-02-product-intro-stage" class="clip hf-02-product-intro-stage" data-start="0" data-duration="5" data-track-index="2">
+      <div class="hf-02-product-intro-copy">
+        <h1 class="hf-02-product-intro-title" aria-label="Corgi Chat.">
+          <span id="hf-02-product-intro-title-corgi" class="hf-02-product-intro-title-word">CORGI</span>
+          <span id="hf-02-product-intro-title-chat" class="hf-02-product-intro-title-word">CHAT.</span>
+        </h1>
+        <div class="hf-02-product-intro-address-row">
+          <span id="hf-02-product-intro-paw-chip" class="hf-02-product-intro-paw-chip" aria-hidden="true">
+            <img src="assets/favicon.svg" alt="" />
+          </span>
+          <div class="hf-02-product-intro-terminal">
+            <span id="hf-02-product-intro-address" class="hf-02-product-intro-address"></span><span id="hf-02-product-intro-cursor" class="hf-02-product-intro-cursor" aria-hidden="true"></span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    (() => {
+      window.__timelines = window.__timelines || {};
+      const tl = gsap.timeline({ paused: true });
+      const addressEl = document.querySelector("#hf-02-product-intro-address");
+      const cursorEl = document.querySelector("#hf-02-product-intro-cursor");
+      const sequence = [
+        { t: 0.0, text: "", color: "#241A12" },
+        { t: 0.12, text: "live", color: "#241A12" },
+        { t: 0.28, text: "live from", color: "#241A12" },
+        { t: 0.48, text: "live from 9", color: "#FF5C00" },
+        { t: 0.7, text: "live from 9 Claude", color: "#FF5C00" },
+        { t: 0.96, text: "live from 9 Claude Lane,", color: "#FF5C00" },
+        { t: 1.24, text: "live from 9 Claude Lane, San", color: "#241A12" },
+        { t: 1.5, text: "live from 9 Claude Lane, San Francisco", color: "#241A12" },
+      ];
+
+      const entryAt = (time) => {
+        for (let i = sequence.length - 1; i >= 0; i -= 1) {
+          if (time >= sequence[i].t) return sequence[i];
+        }
+        return sequence[0];
+      };
+
+      tl.fromTo(
+        "#hf-02-product-intro-art",
+        { y: 86, opacity: 0 },
+        { y: 0, opacity: 1, duration: 1.2, ease: "power3.out" },
+        0,
+      );
+      tl.fromTo(
+        ["#hf-02-product-intro-title-corgi", "#hf-02-product-intro-title-chat"],
+        { y: 74, opacity: 0 },
+        { y: 0, opacity: 1, duration: 0.74, stagger: 0.16, ease: "power3.out" },
+        1.3,
+      );
+
+      tl.fromTo(
+        "#hf-02-product-intro-paw-chip",
+        { opacity: 0 },
+        { opacity: 1, duration: 0.34, ease: "power2.out" },
+        2.8,
+      );
+
+      const typeDriver = { t: 0 };
+      tl.to(
+        typeDriver,
+        {
+          t: 2.2,
+          duration: 2.2,
+          ease: "none",
+          onUpdate: () => {
+            const entry = entryAt(typeDriver.t);
+            addressEl.textContent = entry.text;
+            cursorEl.style.background = entry.color;
+          },
+        },
+        2.8,
+      );
+
+      const blink = { p: 0 };
+      tl.to(
+        blink,
+        {
+          p: Math.PI * 2 * 3,
+          duration: 2.2,
+          ease: "none",
+          onUpdate: () => {
+            cursorEl.style.opacity = Math.sin(blink.p) > 0 ? "1" : "0";
+          },
+        },
+        2.8,
+      );
+
+      window.__timelines["02-product-intro"] = tl;
+    })();
+  </script>
+</template>
