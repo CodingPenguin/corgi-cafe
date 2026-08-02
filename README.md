@@ -2,6 +2,13 @@
 
 Corgi Cafe Wall is a live public guestbook for the 24/7 Corgi Cafe at 9 Claude Ln, San Francisco. `/corgi` is the public landing page and `/corgi/chat` is the live guestbook. Anyone can read, but only people at the cafe can post. The UI uses Corgi Insurance's orange, ink, white, gray, and peach brand palette.
 
+## Deployments
+
+- Vercel: https://corgi-cafe.vercel.app/corgi
+- Zo Space: https://danmaruchi.zo.space/corgi
+
+The root Vite app and `api/corgi/[action].ts` are the Vercel deployment. The standalone files under `routes/` remain the Zo Space source. Both deployments use the same Supabase messages and Realtime channel.
+
 ## Realtime chat
 
 Messages live in the dedicated `corgi-cafe` Supabase project and expire after 24 hours. Supabase Realtime delivers new messages over WebSockets without page refreshes or rapid polling. Realtime Presence powers the anonymous “in the room” count, which represents browsers currently viewing the chat rather than cafe occupancy. The server requires `SUPABASE_CORGI_SERVICE_ROLE_KEY` in Zo Settings → Advanced; the service-role key is never exposed to the browser.

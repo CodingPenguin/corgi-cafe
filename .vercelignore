@@ -1,0 +1,6 @@
+videos/
+routes/
+supabase/
+*.md
+data.json
+.git/

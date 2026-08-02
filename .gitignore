@@ -18,3 +18,10 @@ videos/**/footage/clip-*.mp4
 .env
 .env.*
 !.env.example
+.vercel
+.env*
+.vercel
+.env.local
+dist
+node_modules
+*.tsbuildinfo
