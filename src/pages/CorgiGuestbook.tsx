@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from "react"
-import { ArrowLeft, Info, MapPin, Send, Wifi, X } from "lucide-react"
+import { ArrowLeft, Info, Send, X } from "lucide-react"
 import { createClient } from "@supabase/supabase-js"
 
 const SUPABASE_URL = "https://zjwuybogjgljeueurffg.supabase.co"
@@ -418,7 +418,6 @@ export default function CorgiGuestbook() {
                 <article key={message.id} className={`min-w-48 w-fit max-w-[92%] px-5 py-4 sm:min-w-64 sm:max-w-[78%] sm:px-6 sm:py-5 ${mine ? "self-end rounded-[24px] rounded-br-md border-2 border-[#191919] bg-[#ff5c00] text-white shadow-[0_9px_0_#191919,0_16px_30px_rgba(25,25,25,0.18)]" : "self-start rounded-[24px] rounded-bl-md border-2 border-[#191919] bg-white shadow-[0_9px_0_#191919,0_16px_30px_rgba(25,25,25,0.14)]"} ${message.pending ? "opacity-60" : "opacity-100"}`}>
                   <div className="flex min-w-0 flex-wrap items-center gap-x-1.5 gap-y-1">
                     <h2 className={`min-w-0 truncate text-[13px] font-semibold ${mine ? "text-white" : "text-[#191919]"}`}>{message.name}</h2>
-                    <span className={`shrink-0 ${mine ? "text-white/70" : "text-[#ff5c00]"}`}>{message.via === "wifi" ? <Wifi size={12} /> : <MapPin size={12} />}</span>
                     <span className={`text-[11px] ${mine ? "text-white/70" : "text-[#7b7b7b]"}`}>·</span>
                     {message.pending ? (
                       <span className={`text-[11px] ${mine ? "text-white/70" : "text-[#7b7b7b]"}`}>Sending…</span>
