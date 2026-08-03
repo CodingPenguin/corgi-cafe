@@ -14,7 +14,11 @@ type VercelResponse = {
 }
 
 const SUPABASE_URL = "https://zjwuybogjgljeueurffg.supabase.co"
-const DEFAULT_CAFE_LOCATION = { lat: 37.78995, lng: -122.40435, radiusM: 150 }
+const DEFAULT_CAFE_LOCATIONS = [
+  { lat: 37.78995, lng: -122.40435, radiusM: 150 },
+  { lat: 37.762462, lng: -122.388497, radiusM: 150 },
+]
+const DEFAULT_CAFE_LOCATION = DEFAULT_CAFE_LOCATIONS[0]
 const GATE_DISABLED = true
 
 type Message = {
@@ -64,7 +68,9 @@ function presence(lat: number | null, lng: number | null) {
   if (
     lat !== null &&
     lng !== null &&
-    distanceM(lat, lng, DEFAULT_CAFE_LOCATION.lat, DEFAULT_CAFE_LOCATION.lng) <= DEFAULT_CAFE_LOCATION.radiusM
+    DEFAULT_CAFE_LOCATIONS.some(
+      (location) => distanceM(lat, lng, location.lat, location.lng) <= location.radiusM,
+    )
   ) {
     return { allowed: true, via: "geo" as const }
   }

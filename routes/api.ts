@@ -4,7 +4,11 @@ import { mkdir, readFile, rename, writeFile } from "node:fs/promises"
 
 const dataPath = "/home/workspace/Projects/corgi-cafe/data.json"
 const SUPABASE_URL = "https://zjwuybogjgljeueurffg.supabase.co"
-const DEFAULT_CAFE_LOCATION = { lat: 37.78995, lng: -122.40435, radiusM: 150 }
+const DEFAULT_CAFE_LOCATIONS = [
+  { lat: 37.78995, lng: -122.40435, radiusM: 150 },
+  { lat: 37.762462, lng: -122.388497, radiusM: 150 },
+] satisfies CafeLocation[]
+const DEFAULT_CAFE_LOCATION = DEFAULT_CAFE_LOCATIONS[0]
 // TESTING ONLY: set to false before launch — lets anyone post from anywhere
 const GATE_DISABLED = true
 
@@ -115,12 +119,12 @@ function presence(
 ): { allowed: boolean; via: "wifi" | "geo" | null } {
   if (GATE_DISABLED) return { allowed: true, via: "geo" }
   if (ip !== "unknown" && data.networkIps.includes(ip)) return { allowed: true, via: "wifi" }
-  const location = data.cafeLocation ?? DEFAULT_CAFE_LOCATION
-  if (
-    lat !== null &&
-    lng !== null &&
-    distanceM(lat, lng, location.lat, location.lng) <= location.radiusM
-  ) {
+  const locations = data.cafeLocation
+    ? [data.cafeLocation, ...DEFAULT_CAFE_LOCATIONS]
+    : DEFAULT_CAFE_LOCATIONS
+  if (lat !== null && lng !== null && locations.some(
+    (location) => distanceM(lat, lng, location.lat, location.lng) <= location.radiusM,
+  )) {
     return { allowed: true, via: "geo" }
   }
   return { allowed: false, via: null }

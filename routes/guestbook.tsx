@@ -485,7 +485,7 @@ export default function CorgiGuestbook() {
         <footer className="relative z-20 shrink-0 border-t border-[#e1e1e1] bg-white px-4 pb-[max(0.85rem,env(safe-area-inset-bottom))] pt-3 sm:px-8 sm:py-4">
           <div className="mx-auto flex w-full max-w-3xl flex-col items-center justify-between gap-3 sm:flex-row">
             <div className="text-center sm:text-left">
-              <p className="text-sm text-[#4a4a4a]">Watching from afar — come by 9 Claude Lane to join.</p>
+              <p className="text-sm text-[#4a4a4a]">Watching from afar. Visit Claude Lane or Dogpatch to join.</p>
               {rangeNote && <p className="mt-0.5 text-xs text-[#cc4a00]">{rangeNote}</p>}
             </div>
             <span className="shrink-0 rounded-xl bg-[#cc4a00] pb-1">
