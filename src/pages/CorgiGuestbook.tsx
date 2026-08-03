@@ -109,7 +109,7 @@ function tokenizeMessageText(text: string): MessageTextToken[] {
   return tokens
 }
 
-function linkifyMessageText(text: string, keyPrefix: string): React.ReactNode[] {
+function linkifyMessageText(text: string, keyPrefix: string, mine = false): React.ReactNode[] {
   const nodes: React.ReactNode[] = []
   let lastIndex = 0
   const combinedPattern = new RegExp(`\\[([^\\]\\n]+)\\]\\((https?:\\/\\/[^\\s<>"]+)\\)|${URL_PATTERN.source}`, "gi")
@@ -118,7 +118,7 @@ function linkifyMessageText(text: string, keyPrefix: string): React.ReactNode[] 
     if (start > lastIndex) nodes.push(text.slice(lastIndex, start))
     if (match[1] && match[2]) {
       nodes.push(
-        <a key={`${keyPrefix}-${start}-markdown`} href={match[2]} target="_blank" rel="noopener noreferrer nofollow" className="break-words font-medium text-[#ff5c00] underline decoration-1 underline-offset-2 hover:text-[#cc4a00]">
+        <a key={`${keyPrefix}-${start}-markdown`} href={match[2]} target="_blank" rel="noopener noreferrer nofollow" className={mine ? "break-words font-medium text-white underline decoration-white/60 underline-offset-2 hover:decoration-white" : "break-words font-medium text-[#ff5c00] underline decoration-1 underline-offset-2 hover:text-[#cc4a00]"}>
           {match[1]}
         </a>,
       )
@@ -130,7 +130,7 @@ function linkifyMessageText(text: string, keyPrefix: string): React.ReactNode[] 
     if (!trimmed) continue
     const href = /^https?:\/\//i.test(trimmed) ? trimmed : `https://${trimmed}`
     nodes.push(
-      <a key={`${keyPrefix}-${start}-${trimmed}`} href={href} target="_blank" rel="noopener noreferrer nofollow" className="break-all font-medium text-[#ff5c00] underline decoration-1 underline-offset-2 hover:text-[#cc4a00]">
+      <a key={`${keyPrefix}-${start}-${trimmed}`} href={href} target="_blank" rel="noopener noreferrer nofollow" className={mine ? "break-all font-medium text-white underline decoration-white/60 underline-offset-2 hover:decoration-white" : "break-all font-medium text-[#ff5c00] underline decoration-1 underline-offset-2 hover:text-[#cc4a00]"}>
         {trimmed}
       </a>,
     )
@@ -141,19 +141,19 @@ function linkifyMessageText(text: string, keyPrefix: string): React.ReactNode[] 
   return nodes
 }
 
-function renderInlineMessageText(text: string): React.ReactNode[] {
+function renderInlineMessageText(text: string, mine = false): React.ReactNode[] {
   return tokenizeMessageText(text).map((token, index) => {
     const key = `${token.type}-${index}`
-    if (token.type === "code") return <code key={key} className="rounded bg-[#f1f1f1] px-1.5 py-0.5 font-mono text-[0.9em] text-[#191919]">{token.text}</code>
-    const content = linkifyMessageText(token.text, key)
-    if (token.type === "bold") return <strong key={key} className="font-bold text-[#191919]">{content}</strong>
+    if (token.type === "code") return <code key={key} className={mine ? "rounded bg-white/20 px-1.5 py-0.5 font-mono text-[0.9em] text-white" : "rounded bg-[#f1f1f1] px-1.5 py-0.5 font-mono text-[0.9em] text-[#191919]"}>{token.text}</code>
+    const content = linkifyMessageText(token.text, key, mine)
+    if (token.type === "bold") return <strong key={key} className={mine ? "font-bold text-white" : "font-bold text-[#191919]"}>{content}</strong>
     if (token.type === "italic") return <em key={key} className="italic">{content}</em>
     if (token.type === "strike") return <s key={key} className="line-through opacity-70">{content}</s>
     return <React.Fragment key={key}>{content}</React.Fragment>
   })
 }
 
-function renderMessageText(text: string): React.ReactNode {
+function renderMessageText(text: string, mine = false): React.ReactNode {
   const lines = text.split("\n")
   const blocks: React.ReactNode[] = []
   let index = 0
@@ -187,16 +187,16 @@ function renderMessageText(text: string): React.ReactNode {
         items.push(match[1])
         index += 1
       }
-      blocks.push(<ul key={`list-${index}`} className="my-1.5 list-disc space-y-1 pl-5">{items.map((item, itemIndex) => <li key={itemIndex}>{renderInlineMessageText(item)}</li>)}</ul>)
+      blocks.push(<ul key={`list-${index}`} className="my-1.5 list-disc space-y-1 pl-5">{items.map((item, itemIndex) => <li key={itemIndex}>{renderInlineMessageText(item, mine)}</li>)}</ul>)
       continue
     }
 
     if (line.startsWith("> ")) {
-      blocks.push(<blockquote key={`quote-${index}`} className="my-2 border-l-4 border-[#ff5c00] pl-3 italic text-[#7b7b7b]">{renderInlineMessageText(line.slice(2))}</blockquote>)
+      blocks.push(<blockquote key={`quote-${index}`} className={mine ? "my-2 border-l-4 border-white/50 pl-3 italic text-white/80" : "my-2 border-l-4 border-[#ff5c00] pl-3 italic text-[#7b7b7b]"}>{renderInlineMessageText(line.slice(2), mine)}</blockquote>)
     } else if (line === "") {
       blocks.push(<span key={`break-${index}`} className="block h-2" />)
     } else {
-      blocks.push(<span key={`line-${index}`} className="block">{renderInlineMessageText(line)}</span>)
+      blocks.push(<span key={`line-${index}`} className="block">{renderInlineMessageText(line, mine)}</span>)
     }
     index += 1
   }
@@ -226,6 +226,7 @@ export default function CorgiGuestbook() {
   const listRef = useRef<HTMLDivElement>(null)
   const composerRef = useRef<HTMLTextAreaElement>(null)
   const nearBottomRef = useRef(true)
+  const mineRef = useRef(new Set<string>())
 
   const loadMessages = useCallback(async (coordinates = storedCoordinates()) => {
     try {
@@ -308,6 +309,7 @@ export default function CorgiGuestbook() {
       })
       if (!response.ok) throw new Error("send failed")
       const data = (await response.json()) as SendResponse
+      mineRef.current.add(data.message.id)
       setMessages((current) => mergeMessages(
         current.filter((message) => message.id !== localId),
         [{ ...data.message, pending: false }],
@@ -324,6 +326,7 @@ export default function CorgiGuestbook() {
     if (!cleanText || !allowed) return
     const localId = `local-${crypto.randomUUID()}`
     const messageName = name.trim() || "Anonymous Corgi"
+    mineRef.current.add(localId)
     setMessages((current) => mergeMessages(current, [{
       id: localId,
       name: messageName,
@@ -424,7 +427,8 @@ export default function CorgiGuestbook() {
       <div
         ref={listRef}
         onScroll={(event) => { const target = event.currentTarget; nearBottomRef.current = target.scrollHeight - target.scrollTop - target.clientHeight < 100 }}
-        className="relative min-h-0 flex-1 overflow-y-auto overflow-x-hidden bg-[#f6f6f6]"
+        style={{ backgroundImage: "linear-gradient(rgba(255,255,255,0.65), rgba(255,255,255,0.65)), url('/images/corgi-doodle.webp')", backgroundPosition: "center", backgroundSize: "cover" }}
+        className="relative min-h-0 flex-1 overflow-y-auto overflow-x-hidden"
       >
         {!loaded && messages.length === 0 ? (
           <div className="flex min-h-full items-center justify-center px-6 text-center text-sm text-[#7b7b7b]">Opening the guestbook…</div>
@@ -434,30 +438,31 @@ export default function CorgiGuestbook() {
             <p className="mt-3 text-sm text-[#7b7b7b]">Notes last 24 hours, then the page turns.</p>
           </div>
         ) : (
-          <div className="mx-auto my-6 w-full max-w-3xl px-3 py-2 sm:px-6">
-            <div className="divide-y divide-[#ececec] overflow-hidden rounded-2xl border border-[#e1e1e1] bg-white">
-              {messages.map((message) => (
-                <article key={message.id} className={`min-w-0 px-5 py-5 sm:px-7 ${message.pending ? "opacity-60" : "opacity-100"}`}>
+          <div className="mx-auto flex w-full max-w-3xl flex-col gap-3 px-3 py-6 sm:px-6">
+            {messages.map((message) => {
+              const mine = mineRef.current.has(message.id)
+              return (
+                <article key={message.id} className={`min-w-0 max-w-[82%] px-4 py-3 sm:max-w-[70%] ${mine ? "self-end rounded-2xl rounded-br-md bg-[#ff5c00] text-white shadow-[0_6px_20px_rgba(255,92,0,0.35)]" : "self-start rounded-2xl rounded-bl-md border border-[#e1e1e1] bg-white shadow-[0_6px_20px_rgba(25,25,25,0.10)]"} ${message.pending ? "opacity-60" : "opacity-100"}`}>
                   <div className="flex min-w-0 flex-wrap items-center gap-x-1.5 gap-y-1">
-                    <h2 className="min-w-0 truncate text-[15px] font-semibold text-[#191919]">{message.name}</h2>
-                    <span className="shrink-0 text-[#ff5c00]">{message.via === "wifi" ? <Wifi size={12} /> : <MapPin size={12} />}</span>
-                    <span className="text-xs text-[#7b7b7b]">·</span>
+                    <h2 className={`min-w-0 truncate text-[13px] font-semibold ${mine ? "text-white" : "text-[#191919]"}`}>{message.name}</h2>
+                    <span className={`shrink-0 ${mine ? "text-white/70" : "text-[#ff5c00]"}`}>{message.via === "wifi" ? <Wifi size={12} /> : <MapPin size={12} />}</span>
+                    <span className={`text-[11px] ${mine ? "text-white/70" : "text-[#7b7b7b]"}`}>·</span>
                     {message.pending ? (
-                      <span className="text-xs text-[#7b7b7b]">Sending…</span>
+                      <span className={`text-[11px] ${mine ? "text-white/70" : "text-[#7b7b7b]"}`}>Sending…</span>
                     ) : message.failed ? (
                       <span className="inline-flex items-center gap-2">
-                        <span className="text-xs text-[#cc4a00]">Not sent</span>
-                        <button type="button" onClick={() => retryMessage(message)} className="text-xs font-medium text-[#ff5c00] underline underline-offset-2 hover:text-[#cc4a00]">Retry</button>
-                        <button type="button" onClick={() => dismissMessage(message.id)} aria-label="Dismiss failed message" className="grid size-5 place-items-center rounded text-[#7b7b7b] hover:bg-[#f1f1f1] hover:text-[#191919]"><X size={12} /></button>
+                        <span className="text-[11px] text-white">Not sent</span>
+                        <button type="button" onClick={() => retryMessage(message)} className="text-[11px] font-medium text-white underline underline-offset-2">Retry</button>
+                        <button type="button" onClick={() => dismissMessage(message.id)} aria-label="Dismiss failed message" className="grid size-5 place-items-center rounded text-white hover:bg-white/20"><X size={12} /></button>
                       </span>
                     ) : (
-                      <time dateTime={new Date(message.ts).toISOString()} className="text-xs text-[#7b7b7b]">{relativeTime(message.ts)}</time>
+                      <time dateTime={new Date(message.ts).toISOString()} className={`text-[11px] ${mine ? "text-white/70" : "text-[#7b7b7b]"}`}>{relativeTime(message.ts)}</time>
                     )}
                   </div>
-                  <div className="mt-2 min-w-0 break-words text-[15px] leading-7 text-[#4a4a4a]">{renderMessageText(message.text)}</div>
+                  <div className={`mt-2 min-w-0 break-words text-[15px] leading-6 ${mine ? "text-white" : "text-[#4a4a4a]"}`}>{renderMessageText(message.text, mine)}</div>
                 </article>
-              ))}
-            </div>
+              )
+            })}
           </div>
         )}
       </div>
@@ -485,7 +490,7 @@ export default function CorgiGuestbook() {
         <footer className="relative z-20 shrink-0 border-t border-[#e1e1e1] bg-white px-4 pb-[max(0.85rem,env(safe-area-inset-bottom))] pt-3 sm:px-8 sm:py-4">
           <div className="mx-auto flex w-full max-w-3xl flex-col items-center justify-between gap-3 sm:flex-row">
             <div className="text-center sm:text-left">
-              <p className="text-sm text-[#4a4a4a]">Watching from afar — come by 9 Claude Lane to join.</p>
+              <p className="text-sm text-[#4a4a4a]">Watching from afar. Visit Claude Lane or Dogpatch to join.</p>
               {rangeNote && <p className="mt-0.5 text-xs text-[#cc4a00]">{rangeNote}</p>}
             </div>
             <span className="shrink-0 rounded-xl bg-[#cc4a00] pb-1">
