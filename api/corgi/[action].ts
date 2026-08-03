@@ -14,11 +14,7 @@ type VercelResponse = {
 }
 
 const SUPABASE_URL = "https://zjwuybogjgljeueurffg.supabase.co"
-const DEFAULT_CAFE_LOCATIONS = [
-  { lat: 37.78995, lng: -122.40435, radiusM: 150 },
-  { lat: 37.762462, lng: -122.388497, radiusM: 150 },
-]
-const DEFAULT_CAFE_LOCATION = DEFAULT_CAFE_LOCATIONS[0]
+const DEFAULT_CAFE_LOCATION = { lat: 37.78995, lng: -122.40435, radiusM: 150 }
 const GATE_DISABLED = false
 
 type Message = {
@@ -68,9 +64,7 @@ function presence(lat: number | null, lng: number | null) {
   if (
     lat !== null &&
     lng !== null &&
-    DEFAULT_CAFE_LOCATIONS.some(
-      (location) => distanceM(lat, lng, location.lat, location.lng) <= location.radiusM,
-    )
+    distanceM(lat, lng, DEFAULT_CAFE_LOCATION.lat, DEFAULT_CAFE_LOCATION.lng) <= DEFAULT_CAFE_LOCATION.radiusM
   ) {
     return { allowed: true, via: "geo" as const }
   }
@@ -135,13 +129,23 @@ export default async function handler(request: VercelRequest, response: VercelRe
   response.setHeader("Cache-Control", "no-store")
   const action = Array.isArray(request.query.action) ? request.query.action[0] : request.query.action
 
+  if (action === "presence" && request.method === "GET") {
+    return response.status(200).json({
+      presence: presence(numeric(request.query.lat), numeric(request.query.lng)),
+    })
+  }
+
   if (action === "messages" && request.method === "GET") {
+    const currentPresence = presence(numeric(request.query.lat), numeric(request.query.lng))
+    if (!currentPresence.allowed) {
+      return response.status(403).json({ error: "not-at-cafe" })
+    }
     const key = serviceRoleKey()
     if (!key) return response.status(503).json({ error: "message-service-unavailable" })
     try {
       return response.status(200).json({
         messages: await fetchMessages(key),
-        presence: presence(numeric(request.query.lat), numeric(request.query.lng)),
+        presence: currentPresence,
         configured: true,
       })
     } catch {

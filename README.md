@@ -1,6 +1,6 @@
 # Corgi Cafe Wall
 
-Corgi Cafe Wall is a live public guestbook for Corgi Cafe's San Francisco locations at 9 Claude Ln and 2146 3rd St. `/corgi` is the public landing page and `/corgi/chat` is the live guestbook. Anyone can read, but only people at either cafe can post. The UI uses Corgi Insurance's orange, ink, white, gray, and peach brand palette.
+Corgi Cafe Wall is a location-gated live chatroom for Corgi Cafe at 9 Claude Ln. `/corgi` is the public landing page and `/corgi/chat` is available only after a successful location check from the cafe. The upcoming 2146 3rd St location appears on the landing page but does not pass the geogate yet. The UI uses Corgi Insurance's orange, ink, white, gray, and peach brand palette.
 
 ## Deployments
 
@@ -13,7 +13,7 @@ Messages live in the dedicated `corgi-cafe` Supabase project and expire after 24
 
 ## Presence
 
-Browser geolocation is the primary gate. The API works out of the box with 150m radii around 9 Claude Ln (`37.78995, -122.40435`) and 2146 3rd St (`37.762462, -122.388497`); no admin setup is required. A registered cafe public IP is an optional fast-path that lets guests on cafe Wi-Fi post without a location prompt. Messages retain a small location or network presence badge.
+Browser geolocation gates both reading and posting. The API uses a 150m radius around 9 Claude Ln (`37.78995, -122.40435`). The 2146 3rd St location is marked coming soon and is not active in the gate. Messages retain a small location badge.
 
 ## Legacy admin
 

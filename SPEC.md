@@ -1,12 +1,12 @@
 # Corgi Cafe Wall — Spec
 
-A live chat wall for Corgi Cafe at 9 Claude Ln, San Francisco, hosted on Zo Space (danmaruchi.zo.space). Anyone can WATCH from anywhere; you can only POST when browser geolocation puts you within 150m of the built-in cafe location. Owners may optionally register the cafe Wi-Fi's public IP as a zero-prompt fast-path.
+A live chatroom for Corgi Cafe at 9 Claude Ln, San Francisco, deployed on Vercel. Both reading and posting require browser geolocation within 150m of the cafe.
 
 ## Deliverables — write exactly these files in this directory
 
 1. `routes/api.ts` — Hono API route (deployed at `/api/corgi/:action`)
 2. `routes/chat.tsx` — React landing page (deployed at `/corgi`, public)
-3. `routes/guestbook.tsx` — React guestbook (deployed at `/corgi/chat`, public)
+3. `routes/guestbook.tsx` — Legacy React chatroom route (formerly deployed at `/corgi/chat`)
 4. `routes/admin.tsx` — React page (deployed at `/corgi/admin`, private/owner-only)
 5. `README.md` — short: what it is, how presence works, how admin setup works
 
@@ -15,7 +15,7 @@ Do NOT create package.json, node_modules, configs, or tests. These files are dep
 ## Hard platform constraints (Zo Space)
 
 - `routes/api.ts`: MUST have a single default export `(c: Context) => Response | Promise<Response>` with `import type { Context } from "hono"`. Runs server-side in Bun. May use `node:fs`, `node:crypto`. NO other imports, NO URL/esm.sh imports. Dynamic segment is read with `c.req.param("action")`.
-- `routes/chat.tsx`, `routes/guestbook.tsx`, and `routes/admin.tsx`: each MUST have a default-export React component. Use `react` and `lucide-react`; `routes/guestbook.tsx` may additionally import the pinned browser ESM build of `@supabase/supabase-js`. Style with Tailwind CSS classes (Tailwind 4 is available). No CSS files.
+- The `routes/` files are retained only as historical Zo Space references. The root Vite app and `api/` directory are the production source.
 - All `fetch()` calls from pages to the API MUST include header `"Accept": "application/json"`.
 - Each file is standalone — no imports between route files; duplicate small helpers if needed.
 
@@ -63,18 +63,18 @@ All responses are JSON via `c.json(...)`.
 
 Preserve the full-bleed flying-corgi hero and link its primary call to action to `/corgi/chat`. The landing page has no chat transport or state.
 
-## Guestbook page — `/corgi/chat`
+## Chatroom page — `/corgi/chat`
 
-Full-screen live cafe guestbook with a warm paper surface, subtle grain, compact identity bar, accurate room count, chronological ledger, and pinned composer. Secondary room details live behind one info icon; there is no welcome card or permanent sidebar.
+Full-screen live cafe chatroom with a warm paper surface, subtle grain, compact identity bar, accurate room count, chronological chat bubbles, and a floating composer. Secondary room details live behind one info icon; there is no welcome card or permanent sidebar.
 
 Behavior:
+- The landing page requests browser location and validates it through `GET /api/corgi/presence`. A successful check asks for a display name before entering the chatroom.
+- Direct visits without stored coordinates and a name return to `/corgi`. `GET /api/corgi/messages` also rejects out-of-range coordinates before returning history.
 - Fetch `GET /api/corgi/messages` once for initial history and posting presence, then receive new messages through a Supabase Realtime WebSocket subscription. No rapid polling or post-send refetch.
 - Join the public `corgi-room` Presence channel with an anonymous browser ID and show the number of unique connected browsers as “N in the room.” This is chat viewership, not cafe occupancy.
 - Message list: name, text, relative timestamp ("just now", "4m ago", "2h ago", else local time), and a small location/network icon. Auto-scroll to newest only when the user is already near the bottom.
-- Presence banner:
-  - allowed → "🟢 You're at the cafe — say hi!" and enabled composer (name input persisted in localStorage `corgi-name`, text input, send button; Enter sends).
-  - not allowed → "👀 Watching from afar. Come by 9 Claude Ln to join the chat." with an "I'm at the cafe 📍" button that calls `navigator.geolocation.getCurrentPosition`, stores coords in sessionStorage `corgi-geo`, and refetches; if still not allowed, show "Hmm, you don't seem to be in range yet." Composer hidden/disabled.
-  - User-facing chat copy never mentions Wi-Fi; the legacy 📶 message badge remains supported.
+- The composer is available only after the landing gate succeeds. The display name persists in localStorage `corgi-name`; Enter sends.
+- User-facing chat copy never mentions Wi-Fi; the legacy network message badge remains supported.
 - Handle fetch errors quietly (keep last known state, small "reconnecting…" hint).
 - Empty state: "No barks yet. Be the first at the cafe. 🦴"
 - Mobile-friendly single column, max-w ~2xl, full-height layout with composer pinned at bottom.

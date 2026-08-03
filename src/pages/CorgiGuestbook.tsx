@@ -217,8 +217,6 @@ export default function CorgiGuestbook() {
   const [allowed, setAllowed] = useState(false)
   const [loaded, setLoaded] = useState(false)
   const [reconnecting, setReconnecting] = useState(false)
-  const [rangeNote, setRangeNote] = useState("")
-  const [locating, setLocating] = useState(false)
   const [name, setName] = useState("")
   const [text, setText] = useState("")
   const [viewerCount, setViewerCount] = useState(0)
@@ -239,6 +237,11 @@ export default function CorgiGuestbook() {
       const response = await fetch(`/api/corgi/messages${suffix}`, {
         headers: { Accept: "application/json" },
       })
+      if (response.status === 403) {
+        sessionStorage.removeItem("corgi-geo")
+        window.location.replace("/corgi")
+        return false
+      }
       if (!response.ok) throw new Error("messages unavailable")
       const data = (await response.json()) as MessagesResponse
       setMessages(data.messages)
@@ -253,38 +256,50 @@ export default function CorgiGuestbook() {
   }, [])
 
   useEffect(() => {
-    setName(localStorage.getItem("corgi-name") || "")
-    void loadMessages()
-    const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
-    const channel = supabase.channel("corgi-room", {
-      config: { presence: { key: sessionId() } },
+    const savedName = localStorage.getItem("corgi-name") || ""
+    if (!storedCoordinates() || !savedName.trim()) {
+      window.location.replace("/corgi")
+      return
+    }
+    setName(savedName)
+    let supabase: ReturnType<typeof createClient> | null = null
+    let channel: ReturnType<ReturnType<typeof createClient>["channel"]> | null = null
+    let cancelled = false
+
+    void loadMessages().then((inRange) => {
+      if (!inRange || cancelled) return
+      supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+      channel = supabase.channel("corgi-room", {
+        config: { presence: { key: sessionId() } },
+      })
+        .on(
+          "postgres_changes",
+          { event: "INSERT", schema: "public", table: "corgi_messages" },
+          (payload) => {
+            const row = payload.new as SupabaseMessage
+            setMessages((current) => mergeMessages(current, [{
+              id: row.id,
+              name: row.name,
+              text: row.text,
+              ts: new Date(row.created_at).getTime(),
+              via: row.via,
+            }]))
+          },
+        )
+        .on("presence", { event: "sync" }, () => {
+          setViewerCount(Object.keys(channel?.presenceState() ?? {}).length)
+        })
+        .on("broadcast", { event: "clear" }, () => setMessages([]))
+        .subscribe(async (status) => {
+          const connected = status === "SUBSCRIBED"
+          setReconnecting(!connected)
+          if (connected) await channel?.track({ online_at: new Date().toISOString() })
+        })
     })
-      .on(
-        "postgres_changes",
-        { event: "INSERT", schema: "public", table: "corgi_messages" },
-        (payload) => {
-          const row = payload.new as SupabaseMessage
-          setMessages((current) => mergeMessages(current, [{
-            id: row.id,
-            name: row.name,
-            text: row.text,
-            ts: new Date(row.created_at).getTime(),
-            via: row.via,
-          }]))
-        },
-      )
-      .on("presence", { event: "sync" }, () => {
-        setViewerCount(Object.keys(channel.presenceState()).length)
-      })
-      .on("broadcast", { event: "clear" }, () => setMessages([]))
-      .subscribe(async (status) => {
-        const connected = status === "SUBSCRIBED"
-        setReconnecting(!connected)
-        if (connected) await channel.track({ online_at: new Date().toISOString() })
-      })
 
     return () => {
-      void supabase.removeChannel(channel)
+      cancelled = true
+      if (supabase && channel) void supabase.removeChannel(channel)
     }
   }, [loadMessages])
 
@@ -351,26 +366,6 @@ export default function CorgiGuestbook() {
     setMessages((current) => current.filter((message) => message.id !== messageId))
   }
 
-  function checkLocation() {
-    setLocating(true)
-    setRangeNote("")
-    navigator.geolocation.getCurrentPosition(
-      async ({ coords }) => {
-        const coordinates = { lat: coords.latitude, lng: coords.longitude }
-        sessionStorage.setItem("corgi-geo", JSON.stringify(coordinates))
-        const inRange = await loadMessages(coordinates)
-        if (inRange === false) setRangeNote("Hmm, you don't seem to be in range yet.")
-        setLocating(false)
-      },
-      () => {
-        setRangeNote("Hmm, you don't seem to be in range yet.")
-        setLocating(false)
-      },
-      { enableHighAccuracy: true, timeout: 10_000 },
-    )
-  }
-
-
   function wrapSelection(before: string, after = before) {
     const composer = composerRef.current
     if (!composer) return
@@ -408,7 +403,7 @@ export default function CorgiGuestbook() {
               <ArrowLeft size={15} />
             </a>
             <div className="min-w-0">
-              <h1 className="truncate text-xl font-bold leading-none tracking-[-0.04em] text-white sm:text-2xl">Corgi Chat.</h1>
+              <h1 className="truncate text-xl font-bold leading-none tracking-[-0.04em] text-white sm:text-2xl">Corgi Chat</h1>
             </div>
           </div>
           <div className="flex shrink-0 items-center gap-2.5 sm:gap-3">
@@ -416,7 +411,7 @@ export default function CorgiGuestbook() {
               <span className={`size-1.5 rounded-full ${reconnecting ? "bg-amber-500" : "bg-emerald-600"}`} />
               <span className="hidden sm:inline">Live · </span>{viewerCount} in the room
             </span>
-            <button type="button" onClick={() => setInfoOpen(true)} aria-label="About this guestbook" className="grid size-9 place-items-center rounded-full border-2 border-[#191919] bg-white text-[#191919] shadow-[0_3px_0_#191919] transition-transform hover:-translate-y-0.5 active:translate-y-[3px] active:shadow-none">
+            <button type="button" onClick={() => setInfoOpen(true)} aria-label="About this chatroom" className="grid size-9 place-items-center rounded-full border-2 border-[#191919] bg-white text-[#191919] shadow-[0_3px_0_#191919] transition-transform hover:-translate-y-0.5 active:translate-y-[3px] active:shadow-none">
               <Info size={15} />
             </button>
           </div>
@@ -430,11 +425,11 @@ export default function CorgiGuestbook() {
         className="relative min-h-0 flex-1 overflow-y-auto overflow-x-hidden"
       >
         {!loaded && messages.length === 0 ? (
-          <div className="flex min-h-full items-center justify-center px-6 text-center text-sm text-[#7b7b7b]">Opening the guestbook…</div>
+          <div className="flex min-h-full items-center justify-center px-6 text-center text-sm text-[#7b7b7b]">Opening the chatroom…</div>
         ) : messages.length === 0 ? (
           <div className="flex min-h-full flex-col items-center justify-center px-6 py-16 text-center">
-            <p style={{ fontFamily: "Instrument Serif, serif" }} className="text-4xl italic text-[#ff5c00] sm:text-5xl">The first page is yours.</p>
-            <p className="mt-3 text-sm text-[#7b7b7b]">Notes last 24 hours, then the page turns.</p>
+            <p style={{ fontFamily: "Instrument Serif, serif" }} className="text-4xl italic text-[#ff5c00] sm:text-5xl">Start the conversation.</p>
+            <p className="mt-3 text-sm text-[#7b7b7b]">Messages disappear after 24 hours.</p>
           </div>
         ) : (
           <div className={`mx-auto flex w-full max-w-4xl flex-col gap-4 px-3 py-6 sm:gap-5 sm:px-8 sm:py-10 ${allowed ? "pb-44 sm:pb-40" : "pb-32 sm:pb-28"}`}>
@@ -478,37 +473,25 @@ export default function CorgiGuestbook() {
             </div>
             <div className="flex min-w-0 gap-2">
               <input value={name} onChange={(event) => saveName(event.target.value)} maxLength={30} placeholder="Your name" aria-label="Your name" className="h-11 w-[6.5rem] shrink-0 rounded-xl border border-[#e1e1e1] bg-white px-2.5 text-sm text-[#191919] outline-none placeholder:text-[#7b7b7b] focus:border-[#ff5c00] sm:w-36 sm:px-3" />
-              <textarea ref={composerRef} value={text} onChange={(event) => setText(event.target.value)} onKeyDown={(event) => { if (event.key === "Enter" && !event.shiftKey) { event.preventDefault(); void sendMessage() } }} maxLength={500} rows={1} placeholder="Leave a note…" aria-label="Message" className="h-11 min-w-0 flex-1 resize-none rounded-xl border border-[#e1e1e1] bg-white px-3 py-2.5 text-sm leading-5 text-[#191919] outline-none placeholder:text-[#7b7b7b] focus:border-[#ff5c00]" />
+              <textarea ref={composerRef} value={text} onChange={(event) => setText(event.target.value)} onKeyDown={(event) => { if (event.key === "Enter" && !event.shiftKey) { event.preventDefault(); void sendMessage() } }} maxLength={500} rows={1} placeholder="Send a message…" aria-label="Message" className="h-11 min-w-0 flex-1 resize-none rounded-xl border border-[#e1e1e1] bg-white px-3 py-2.5 text-sm leading-5 text-[#191919] outline-none placeholder:text-[#7b7b7b] focus:border-[#ff5c00]" />
               <span className="shrink-0 rounded-xl bg-[#cc4a00] pb-1">
                 <button type="button" onClick={() => void sendMessage()} disabled={!text.trim()} aria-label="Send message" className="grid size-11 place-items-center rounded-xl bg-[#ff5c00] text-white transition-transform active:translate-y-1 disabled:opacity-40"><Send size={17} /></button>
               </span>
             </div>
           </div>
         </footer>
-      ) : (
-        <footer className="pointer-events-none absolute inset-x-0 bottom-0 z-20 px-3 pb-[max(1rem,env(safe-area-inset-bottom))] sm:px-8 sm:pb-6">
-          <div className="pointer-events-auto mx-auto flex w-full max-w-3xl flex-col items-center justify-between gap-3 rounded-[22px] border-2 border-[#191919] bg-white p-3 shadow-[0_8px_0_#191919,0_18px_50px_rgba(25,25,25,0.22)] sm:flex-row sm:p-4">
-            <div className="text-center sm:text-left">
-              <p className="text-sm text-[#4a4a4a]">Watching from afar. Visit Claude Lane or Dogpatch to join.</p>
-              {rangeNote && <p className="mt-0.5 text-xs text-[#cc4a00]">{rangeNote}</p>}
-            </div>
-            <span className="shrink-0 rounded-xl bg-[#cc4a00] pb-1">
-              <button type="button" onClick={checkLocation} disabled={locating} className="inline-flex h-10 items-center gap-1.5 rounded-xl bg-[#ff5c00] px-4 text-sm font-medium text-white transition-transform active:translate-y-1 disabled:opacity-40"><MapPin size={13} />{locating ? "Checking…" : "I’m at the cafe"}</button>
-            </span>
-          </div>
-        </footer>
-      )}
+      ) : null}
 
       {infoOpen && (
         <div className="absolute inset-0 z-50 flex items-start justify-end bg-[#191919]/10 p-3 pt-16 sm:p-6 sm:pt-20" role="presentation" onClick={() => setInfoOpen(false)}>
-          <section role="dialog" aria-modal="true" aria-labelledby="guestbook-info" onClick={(event) => event.stopPropagation()} className="w-full max-w-xs rounded-2xl border border-[#e1e1e1] bg-white p-5 shadow-[0_12px_40px_rgba(0,0,0,0.10)]">
+          <section role="dialog" aria-modal="true" aria-labelledby="chatroom-info" onClick={(event) => event.stopPropagation()} className="w-full max-w-xs rounded-2xl border border-[#e1e1e1] bg-white p-5 shadow-[0_12px_40px_rgba(0,0,0,0.10)]">
             <div className="flex items-start justify-between gap-4">
-              <h2 id="guestbook-info" className="text-sm font-semibold text-[#191919]">About the room</h2>
+              <h2 id="chatroom-info" className="text-sm font-semibold text-[#191919]">About the chatroom</h2>
               <button type="button" onClick={() => setInfoOpen(false)} aria-label="Close information" className="grid size-7 place-items-center rounded-full text-[#7b7b7b] hover:bg-[#f1f1f1] hover:text-[#191919]"><X size={14} /></button>
             </div>
             <div className="mt-4 space-y-3 text-sm leading-6 text-[#4a4a4a]">
-              <p>{allowed ? "Posting is open from your current connection." : "Anyone can read. Posting unlocks when you’re at the cafe."}</p>
-              <p>Notes remain in the guestbook for 24 hours.</p>
+              <p>You’re inside the Corgi Cafe chatroom.</p>
+              <p>Messages remain in the chatroom for 24 hours.</p>
               {reconnecting && <p className="text-[#cc4a00]">The live connection is reconnecting.</p>}
             </div>
           </section>
