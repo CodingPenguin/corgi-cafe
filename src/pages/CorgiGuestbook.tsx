@@ -442,8 +442,8 @@ export default function CorgiGuestbook() {
 
       {allowed ? (
         <footer className="pointer-events-none absolute inset-x-0 bottom-0 z-20 px-3 pb-[max(1rem,env(safe-area-inset-bottom))] sm:px-8 sm:pb-6">
-          <div className="pointer-events-auto mx-auto flex w-full max-w-3xl min-w-0 gap-2 rounded-[22px] border-2 border-[#191919] bg-white p-2.5 shadow-[0_8px_0_#191919,0_18px_50px_rgba(25,25,25,0.22)] sm:p-3">
-            <textarea value={text} onChange={(event) => setText(event.target.value)} onKeyDown={(event) => { if (event.key === "Enter" && !event.shiftKey) { event.preventDefault(); void sendMessage() } }} maxLength={500} rows={1} placeholder="Send a message…" aria-label="Message" className="h-11 min-w-0 flex-1 resize-none rounded-xl border border-[#e1e1e1] bg-white px-3 py-2.5 text-base leading-5 text-[#191919] outline-none placeholder:text-[#7b7b7b] focus:border-[#ff5c00]" />
+          <div className="pointer-events-auto mx-auto flex w-full max-w-3xl min-w-0 items-center gap-2 rounded-[22px] border-2 border-[#191919] bg-white py-2.5 pl-5 pr-2.5 shadow-[0_8px_0_#191919,0_18px_50px_rgba(25,25,25,0.22)] transition-colors focus-within:border-[#ff5c00] sm:py-3 sm:pl-6 sm:pr-3">
+            <textarea value={text} onChange={(event) => setText(event.target.value)} onKeyDown={(event) => { if (event.key === "Enter" && !event.shiftKey) { event.preventDefault(); void sendMessage() } }} maxLength={500} rows={1} placeholder="Send a message…" aria-label="Message" className="h-11 min-w-0 flex-1 resize-none border-0 bg-transparent py-2.5 text-base leading-5 text-[#191919] outline-none placeholder:text-[#7b7b7b]" />
             <span className="shrink-0 rounded-xl bg-[#cc4a00] pb-1">
               <button type="button" onClick={() => void sendMessage()} disabled={!text.trim()} aria-label="Send message" className="grid size-11 place-items-center rounded-xl bg-[#ff5c00] text-white transition-transform active:translate-y-1 disabled:opacity-40"><Send size={17} /></button>
             </span>
