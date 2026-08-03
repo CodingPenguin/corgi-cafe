@@ -5,9 +5,7 @@ Corgi Cafe Wall is a live public guestbook for Corgi Cafe's San Francisco locati
 ## Deployments
 
 - Vercel: https://corgi-cafe.vercel.app/corgi
-- Zo Space: https://danmaruchi.zo.space/corgi
-
-The root Vite app and `api/corgi/[action].ts` are the Vercel deployment. The standalone files under `routes/` remain the Zo Space source. Both deployments use the same Supabase messages and Realtime channel.
+The root Vite app and `api/corgi/[action].ts` are the production deployment. The standalone files under `routes/` retain the former Zo Space implementation for reference; all Corgi routes and assets were removed from Zo Space on August 2, 2026.
 
 ## Realtime chat
 
@@ -17,6 +15,6 @@ Messages live in the dedicated `corgi-cafe` Supabase project and expire after 24
 
 Browser geolocation is the primary gate. The API works out of the box with 150m radii around 9 Claude Ln (`37.78995, -122.40435`) and 2146 3rd St (`37.762462, -122.388497`); no admin setup is required. A registered cafe public IP is an optional fast-path that lets guests on cafe Wi-Fi post without a location prompt. Messages retain a small location or network presence badge.
 
-## Admin setup
+## Legacy admin
 
-Open `/corgi/admin` and enter a passphrase. Set a custom cafe location/radius from your current position or reset to the built-in 9 Claude Ln default; optionally register the cafe network in the collapsed Wi-Fi fast-path section. When `CORGI_ADMIN_SECRET` is unset, the first passphrase of at least six characters claims admin and is stored only as a SHA-256 hash. Set `CORGI_ADMIN_SECRET` in Zo Settings → Advanced to override it. Admin can also forget registered IPs and clear chat history.
+The former Zo Space admin route remains in `routes/admin.tsx` for reference and is not deployed. Vercel currently uses the built-in two-location configuration.
