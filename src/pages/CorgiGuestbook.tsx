@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from "react"
-import { ArrowLeft, Bold, Code2, Info, Italic, Link, MapPin, Send, Wifi, X } from "lucide-react"
+import { ArrowLeft, Info, MapPin, Send, Wifi, X } from "lucide-react"
 import { createClient } from "@supabase/supabase-js"
 
 const SUPABASE_URL = "https://zjwuybogjgljeueurffg.supabase.co"
@@ -222,7 +222,6 @@ export default function CorgiGuestbook() {
   const [viewerCount, setViewerCount] = useState(0)
   const [infoOpen, setInfoOpen] = useState(false)
   const listRef = useRef<HTMLDivElement>(null)
-  const composerRef = useRef<HTMLTextAreaElement>(null)
   const nearBottomRef = useRef(true)
   const mineRef = useRef(new Set<string>())
 
@@ -309,11 +308,6 @@ export default function CorgiGuestbook() {
     }
   }, [messages])
 
-  function saveName(value: string) {
-    setName(value)
-    localStorage.setItem("corgi-name", value)
-  }
-
   async function postMessage(localId: string, messageName: string, messageText: string) {
     try {
       const coordinates = storedCoordinates()
@@ -364,21 +358,6 @@ export default function CorgiGuestbook() {
 
   function dismissMessage(messageId: string) {
     setMessages((current) => current.filter((message) => message.id !== messageId))
-  }
-
-  function wrapSelection(before: string, after = before) {
-    const composer = composerRef.current
-    if (!composer) return
-    const start = composer.selectionStart
-    const end = composer.selectionEnd
-    const selected = text.slice(start, end)
-    const nextText = `${text.slice(0, start)}${before}${selected}${after}${text.slice(end)}`.slice(0, 500)
-    setText(nextText)
-    window.requestAnimationFrame(() => {
-      composer.focus()
-      const selectionStart = start + before.length
-      composer.setSelectionRange(selectionStart, selectionStart + selected.length)
-    })
   }
 
   const style = {
@@ -463,21 +442,11 @@ export default function CorgiGuestbook() {
 
       {allowed ? (
         <footer className="pointer-events-none absolute inset-x-0 bottom-0 z-20 px-3 pb-[max(1rem,env(safe-area-inset-bottom))] sm:px-8 sm:pb-6">
-          <div className="pointer-events-auto mx-auto w-full max-w-3xl rounded-[22px] border-2 border-[#191919] bg-white p-2.5 shadow-[0_8px_0_#191919,0_18px_50px_rgba(25,25,25,0.22)] sm:p-3">
-            <div className="mb-1.5 flex items-center gap-0.5" role="toolbar" aria-label="Message formatting">
-              <button type="button" onClick={() => wrapSelection("**")} aria-label="Bold" title="Bold" className="grid size-8 place-items-center rounded-lg text-[#7b7b7b] hover:bg-[#f1f1f1] hover:text-[#191919]"><Bold size={13} /></button>
-              <button type="button" onClick={() => wrapSelection("*")} aria-label="Italic" title="Italic" className="grid size-8 place-items-center rounded-lg text-[#7b7b7b] hover:bg-[#f1f1f1] hover:text-[#191919]"><Italic size={13} /></button>
-              <button type="button" onClick={() => wrapSelection("`")} aria-label="Inline code" title="Inline code" className="grid size-8 place-items-center rounded-lg text-[#7b7b7b] hover:bg-[#f1f1f1] hover:text-[#191919]"><Code2 size={13} /></button>
-              <button type="button" onClick={() => wrapSelection("[", "](https://)")} aria-label="Link" title="Link" className="grid size-8 place-items-center rounded-lg text-[#7b7b7b] hover:bg-[#f1f1f1] hover:text-[#191919]"><Link size={13} /></button>
-              <span className="ml-auto inline-flex items-center gap-1.5 text-xs text-[#7b7b7b]"><span className="size-1.5 rounded-full bg-emerald-600" />Posting live</span>
-            </div>
-            <div className="flex min-w-0 gap-2">
-              <input value={name} onChange={(event) => saveName(event.target.value)} maxLength={30} placeholder="Your name" aria-label="Your name" className="h-11 w-[6.5rem] shrink-0 rounded-xl border border-[#e1e1e1] bg-white px-2.5 text-sm text-[#191919] outline-none placeholder:text-[#7b7b7b] focus:border-[#ff5c00] sm:w-36 sm:px-3" />
-              <textarea ref={composerRef} value={text} onChange={(event) => setText(event.target.value)} onKeyDown={(event) => { if (event.key === "Enter" && !event.shiftKey) { event.preventDefault(); void sendMessage() } }} maxLength={500} rows={1} placeholder="Send a message…" aria-label="Message" className="h-11 min-w-0 flex-1 resize-none rounded-xl border border-[#e1e1e1] bg-white px-3 py-2.5 text-sm leading-5 text-[#191919] outline-none placeholder:text-[#7b7b7b] focus:border-[#ff5c00]" />
-              <span className="shrink-0 rounded-xl bg-[#cc4a00] pb-1">
-                <button type="button" onClick={() => void sendMessage()} disabled={!text.trim()} aria-label="Send message" className="grid size-11 place-items-center rounded-xl bg-[#ff5c00] text-white transition-transform active:translate-y-1 disabled:opacity-40"><Send size={17} /></button>
-              </span>
-            </div>
+          <div className="pointer-events-auto mx-auto flex w-full max-w-3xl min-w-0 gap-2 rounded-[22px] border-2 border-[#191919] bg-white p-2.5 shadow-[0_8px_0_#191919,0_18px_50px_rgba(25,25,25,0.22)] sm:p-3">
+            <textarea value={text} onChange={(event) => setText(event.target.value)} onKeyDown={(event) => { if (event.key === "Enter" && !event.shiftKey) { event.preventDefault(); void sendMessage() } }} maxLength={500} rows={1} placeholder="Send a message…" aria-label="Message" className="h-11 min-w-0 flex-1 resize-none rounded-xl border border-[#e1e1e1] bg-white px-3 py-2.5 text-base leading-5 text-[#191919] outline-none placeholder:text-[#7b7b7b] focus:border-[#ff5c00]" />
+            <span className="shrink-0 rounded-xl bg-[#cc4a00] pb-1">
+              <button type="button" onClick={() => void sendMessage()} disabled={!text.trim()} aria-label="Send message" className="grid size-11 place-items-center rounded-xl bg-[#ff5c00] text-white transition-transform active:translate-y-1 disabled:opacity-40"><Send size={17} /></button>
+            </span>
           </div>
         </footer>
       ) : null}

@@ -73,7 +73,7 @@ Behavior:
 - Fetch `GET /api/corgi/messages` once for initial history and posting presence, then receive new messages through a Supabase Realtime WebSocket subscription. No rapid polling or post-send refetch.
 - Join the public `corgi-room` Presence channel with an anonymous browser ID and show the number of unique connected browsers as “N in the room.” This is chat viewership, not cafe occupancy.
 - Message list: name, text, relative timestamp ("just now", "4m ago", "2h ago", else local time), and a small location/network icon. Auto-scroll to newest only when the user is already near the bottom.
-- The composer is available only after the landing gate succeeds. The display name persists in localStorage `corgi-name`; Enter sends.
+- The composer is available only after the landing gate succeeds. The display name persists in localStorage `corgi-name` and is not repeated in the composer. The composer contains one message field plus send, while Markdown rendering remains an unadvertised capability. Enter sends, Shift+Enter adds a line break, and mobile form text stays at 16px or larger to prevent iOS focus zoom.
 - User-facing chat copy never mentions Wi-Fi; the legacy network message badge remains supported.
 - Handle fetch errors quietly (keep last known state, small "reconnecting…" hint).
 - Empty state: "No barks yet. Be the first at the cafe. 🦴"
