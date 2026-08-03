@@ -9,8 +9,7 @@ const DEFAULT_CAFE_LOCATIONS = [
   { lat: 37.762462, lng: -122.388497, radiusM: 150 },
 ] satisfies CafeLocation[]
 const DEFAULT_CAFE_LOCATION = DEFAULT_CAFE_LOCATIONS[0]
-// TESTING ONLY: set to false before launch — lets anyone post from anywhere
-const GATE_DISABLED = true
+const GATE_DISABLED = false
 
 type CafeLocation = { lat: number; lng: number; radiusM: number }
 type Message = {

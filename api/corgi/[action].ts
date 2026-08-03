@@ -19,7 +19,7 @@ const DEFAULT_CAFE_LOCATIONS = [
   { lat: 37.762462, lng: -122.388497, radiusM: 150 },
 ]
 const DEFAULT_CAFE_LOCATION = DEFAULT_CAFE_LOCATIONS[0]
-const GATE_DISABLED = true
+const GATE_DISABLED = false
 
 type Message = {
   id: string
