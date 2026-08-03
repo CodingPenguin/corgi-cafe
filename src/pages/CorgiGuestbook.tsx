@@ -401,23 +401,22 @@ export default function CorgiGuestbook() {
   return (
     <main style={style} className="flex h-dvh min-h-dvh w-full flex-col overflow-hidden bg-[#f6f6f6] text-[#191919] selection:bg-[#ff5c00]/20">
       <style>{`@import url('https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&display=swap');`}</style>
-      <header className="relative z-30 shrink-0 border-b border-[#e1e1e1] bg-white px-4 py-3 sm:px-8">
-        <div className="mx-auto flex w-full max-w-5xl items-center justify-between gap-3">
+      <header className="relative z-30 shrink-0 border-b-2 border-[#191919] bg-[#ff5c00] px-3 py-2.5 sm:px-6 sm:py-3">
+        <div className="mx-auto flex w-full max-w-6xl items-center justify-between gap-3">
           <div className="flex min-w-0 items-center gap-3">
-            <a href="/corgi" aria-label="Back to Corgi landing" className="grid size-9 shrink-0 place-items-center rounded-full border border-[#e1e1e1] text-[#7b7b7b] transition-colors hover:border-[#191919] hover:text-[#191919]">
+            <a href="/corgi" aria-label="Back to Corgi landing" className="grid size-9 shrink-0 place-items-center rounded-full border-2 border-[#191919] bg-white text-[#191919] shadow-[0_3px_0_#191919] transition-transform hover:-translate-y-0.5 active:translate-y-[3px] active:shadow-none">
               <ArrowLeft size={15} />
             </a>
             <div className="min-w-0">
-              <h1 className="truncate text-lg font-semibold text-[#191919]">Corgi Chat</h1>
-              <a href="https://www.google.com/maps/search/?api=1&query=9+Claude+Lane+San+Francisco" target="_blank" rel="noopener noreferrer" className="block truncate text-xs text-[#7b7b7b] transition-colors hover:text-[#ff5c00]">9 Claude Lane</a>
+              <h1 className="truncate text-xl font-bold leading-none tracking-[-0.04em] text-white sm:text-2xl">Corgi Chat.</h1>
             </div>
           </div>
-          <div className="flex shrink-0 items-center gap-2.5 sm:gap-4">
-            <span className="inline-flex items-center gap-1.5 whitespace-nowrap text-[11px] text-[#7b7b7b] sm:text-xs">
+          <div className="flex shrink-0 items-center gap-2.5 sm:gap-3">
+            <span className="inline-flex items-center gap-1.5 whitespace-nowrap rounded-full border-2 border-[#191919] bg-white px-2.5 py-1.5 text-[11px] font-semibold text-[#191919] shadow-[0_3px_0_#191919] sm:px-3 sm:text-xs">
               <span className={`size-1.5 rounded-full ${reconnecting ? "bg-amber-500" : "bg-emerald-600"}`} />
-              Live · {viewerCount} in the room
+              <span className="hidden sm:inline">Live · </span>{viewerCount} in the room
             </span>
-            <button type="button" onClick={() => setInfoOpen(true)} aria-label="About this guestbook" className="grid size-9 place-items-center rounded-full border border-[#e1e1e1] text-[#7b7b7b] transition-colors hover:border-[#191919] hover:text-[#191919]">
+            <button type="button" onClick={() => setInfoOpen(true)} aria-label="About this guestbook" className="grid size-9 place-items-center rounded-full border-2 border-[#191919] bg-white text-[#191919] shadow-[0_3px_0_#191919] transition-transform hover:-translate-y-0.5 active:translate-y-[3px] active:shadow-none">
               <Info size={15} />
             </button>
           </div>
@@ -438,11 +437,11 @@ export default function CorgiGuestbook() {
             <p className="mt-3 text-sm text-[#7b7b7b]">Notes last 24 hours, then the page turns.</p>
           </div>
         ) : (
-          <div className="mx-auto flex w-full max-w-3xl flex-col gap-3 px-3 py-6 sm:px-6">
+          <div className={`mx-auto flex w-full max-w-4xl flex-col gap-4 px-3 py-6 sm:gap-5 sm:px-8 sm:py-10 ${allowed ? "pb-44 sm:pb-40" : "pb-32 sm:pb-28"}`}>
             {messages.map((message) => {
               const mine = mineRef.current.has(message.id)
               return (
-                <article key={message.id} className={`min-w-0 max-w-[82%] px-4 py-3 sm:max-w-[70%] ${mine ? "self-end rounded-2xl rounded-br-md bg-[#ff5c00] text-white shadow-[0_6px_20px_rgba(255,92,0,0.35)]" : "self-start rounded-2xl rounded-bl-md border border-[#e1e1e1] bg-white shadow-[0_6px_20px_rgba(25,25,25,0.10)]"} ${message.pending ? "opacity-60" : "opacity-100"}`}>
+                <article key={message.id} className={`min-w-0 w-fit max-w-[92%] px-5 py-4 sm:max-w-[78%] sm:px-6 sm:py-5 ${mine ? "self-end rounded-[24px] rounded-br-md border-2 border-[#191919] bg-[#ff5c00] text-white shadow-[0_9px_0_#191919,0_16px_30px_rgba(25,25,25,0.18)]" : "self-start rounded-[24px] rounded-bl-md border-2 border-[#191919] bg-white shadow-[0_9px_0_#191919,0_16px_30px_rgba(25,25,25,0.14)]"} ${message.pending ? "opacity-60" : "opacity-100"}`}>
                   <div className="flex min-w-0 flex-wrap items-center gap-x-1.5 gap-y-1">
                     <h2 className={`min-w-0 truncate text-[13px] font-semibold ${mine ? "text-white" : "text-[#191919]"}`}>{message.name}</h2>
                     <span className={`shrink-0 ${mine ? "text-white/70" : "text-[#ff5c00]"}`}>{message.via === "wifi" ? <Wifi size={12} /> : <MapPin size={12} />}</span>
@@ -459,7 +458,7 @@ export default function CorgiGuestbook() {
                       <time dateTime={new Date(message.ts).toISOString()} className={`text-[11px] ${mine ? "text-white/70" : "text-[#7b7b7b]"}`}>{relativeTime(message.ts)}</time>
                     )}
                   </div>
-                  <div className={`mt-2 min-w-0 break-words text-[15px] leading-6 ${mine ? "text-white" : "text-[#4a4a4a]"}`}>{renderMessageText(message.text, mine)}</div>
+                  <div className={`mt-2.5 min-w-0 break-words text-[16px] leading-7 ${mine ? "text-white" : "text-[#333333]"}`}>{renderMessageText(message.text, mine)}</div>
                 </article>
               )
             })}
@@ -468,8 +467,8 @@ export default function CorgiGuestbook() {
       </div>
 
       {allowed ? (
-        <footer className="relative z-20 shrink-0 border-t border-[#e1e1e1] bg-white px-3 pb-[max(3rem,env(safe-area-inset-bottom))] pt-2.5 sm:px-8 sm:pb-4 sm:pt-3">
-          <div className="mx-auto w-full max-w-3xl">
+        <footer className="pointer-events-none absolute inset-x-0 bottom-0 z-20 px-3 pb-[max(1rem,env(safe-area-inset-bottom))] sm:px-8 sm:pb-6">
+          <div className="pointer-events-auto mx-auto w-full max-w-3xl rounded-[22px] border-2 border-[#191919] bg-white p-2.5 shadow-[0_8px_0_#191919,0_18px_50px_rgba(25,25,25,0.22)] sm:p-3">
             <div className="mb-1.5 flex items-center gap-0.5" role="toolbar" aria-label="Message formatting">
               <button type="button" onClick={() => wrapSelection("**")} aria-label="Bold" title="Bold" className="grid size-8 place-items-center rounded-lg text-[#7b7b7b] hover:bg-[#f1f1f1] hover:text-[#191919]"><Bold size={13} /></button>
               <button type="button" onClick={() => wrapSelection("*")} aria-label="Italic" title="Italic" className="grid size-8 place-items-center rounded-lg text-[#7b7b7b] hover:bg-[#f1f1f1] hover:text-[#191919]"><Italic size={13} /></button>
@@ -487,8 +486,8 @@ export default function CorgiGuestbook() {
           </div>
         </footer>
       ) : (
-        <footer className="relative z-20 shrink-0 border-t border-[#e1e1e1] bg-white px-4 pb-[max(0.85rem,env(safe-area-inset-bottom))] pt-3 sm:px-8 sm:py-4">
-          <div className="mx-auto flex w-full max-w-3xl flex-col items-center justify-between gap-3 sm:flex-row">
+        <footer className="pointer-events-none absolute inset-x-0 bottom-0 z-20 px-3 pb-[max(1rem,env(safe-area-inset-bottom))] sm:px-8 sm:pb-6">
+          <div className="pointer-events-auto mx-auto flex w-full max-w-3xl flex-col items-center justify-between gap-3 rounded-[22px] border-2 border-[#191919] bg-white p-3 shadow-[0_8px_0_#191919,0_18px_50px_rgba(25,25,25,0.22)] sm:flex-row sm:p-4">
             <div className="text-center sm:text-left">
               <p className="text-sm text-[#4a4a4a]">Watching from afar. Visit Claude Lane or Dogpatch to join.</p>
               {rangeNote && <p className="mt-0.5 text-xs text-[#cc4a00]">{rangeNote}</p>}
