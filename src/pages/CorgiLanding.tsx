@@ -108,6 +108,8 @@ export default function CorgiLanding() {
           <a href="https://www.google.com/maps/search/?api=1&query=9+Claude+Lane+San+Francisco" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1.5 hover:underline"><MapPin size={14} />9 Claude Lane, San Francisco</a>
           <span className="hidden size-1.5 rounded-full bg-[#241a12]/60 sm:block" />
           <span className="inline-flex items-center gap-1.5"><MapPin size={14} />2146 3rd St, San Francisco · Coming soon</span>
+          <span className="hidden size-1.5 rounded-full bg-[#241a12]/60 sm:block" />
+          <span className="italic font-medium text-[#241a12]/65">Not associated with Corgi</span>
         </div>
       </section>
 
