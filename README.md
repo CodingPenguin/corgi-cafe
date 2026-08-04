@@ -4,7 +4,7 @@ Corgi Cafe Wall is a location-gated live chatroom for Corgi Cafe at 9 Claude Ln.
 
 ## Deployments
 
-- Vercel: https://corgi-cafe.vercel.app/corgi
+- Vercel: https://corgi-chat.vercel.app/corgi
 The root Vite app and `api/corgi/[action].ts` are the production deployment. The standalone files under `routes/` retain the former Zo Space implementation for reference; all Corgi routes and assets were removed from Zo Space on August 2, 2026.
 
 ## Realtime chat

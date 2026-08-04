@@ -2,4 +2,4 @@ User-agent: *
 Allow: /corgi$
 Disallow: /corgi/chat
 
-Sitemap: https://corgi-cafe.vercel.app/sitemap.xml
+Sitemap: https://corgi-chat.vercel.app/sitemap.xml
