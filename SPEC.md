@@ -76,7 +76,7 @@ Behavior:
 - The composer is available only after the landing gate succeeds. The display name persists in localStorage `corgi-name` and is not repeated in the composer. The composer contains one message field plus send, while Markdown rendering remains an unadvertised capability. Enter sends, Shift+Enter adds a line break, and mobile form text stays at 16px or larger to prevent iOS focus zoom.
 - User-facing chat copy never mentions Wi-Fi.
 - Handle fetch errors quietly (keep last known state, small "reconnecting…" hint).
-- Empty state: "No barks yet. Be the first at the cafe. 🦴"
+- Empty state: a substantial left-aligned chat bubble with the headline "Quiet in here.", supporting copy "Be the first to say hi.", and understated metadata "Messages disappear after 24 hours."
 - Mobile-friendly single column, max-w ~2xl, full-height layout with composer pinned at bottom.
 
 ## Admin page — `/corgi/admin`

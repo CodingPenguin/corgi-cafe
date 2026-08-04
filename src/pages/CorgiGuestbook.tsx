@@ -406,9 +406,15 @@ export default function CorgiGuestbook() {
         {!loaded && messages.length === 0 ? (
           <div className="flex min-h-full items-center justify-center px-6 text-center text-sm text-[#7b7b7b]">Opening the chatroom…</div>
         ) : messages.length === 0 ? (
-          <div className="flex min-h-full flex-col items-center justify-center px-6 py-16 text-center">
-            <p style={{ fontFamily: "Instrument Serif, serif" }} className="text-4xl italic text-[#ff5c00] sm:text-5xl">Start the conversation.</p>
-            <p className="mt-3 text-sm text-[#7b7b7b]">Messages disappear after 24 hours.</p>
+          <div className="min-h-full bg-[#f6f6f6]/45">
+            <div className={`mx-auto flex w-full max-w-4xl px-3 pt-10 sm:px-8 sm:pt-14 ${allowed ? "pb-44 sm:pb-40" : "pb-32 sm:pb-28"}`}>
+              <section className="w-full max-w-xl rounded-[24px] rounded-bl-md border-2 border-[#191919] bg-white px-6 py-6 shadow-[0_10px_0_#191919,0_20px_40px_rgba(25,25,25,0.18)] sm:px-8 sm:py-8">
+                <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-[#ff5c00]">Corgi Chat</p>
+                <h2 style={{ fontFamily: "Instrument Serif, serif" }} className="mt-4 text-[42px] leading-[0.95] tracking-[-0.03em] text-[#191919] sm:text-5xl">Quiet in here.</h2>
+                <p className="mt-4 text-base font-medium leading-6 text-[#4a4a4a] sm:text-lg">Be the first to say hi.</p>
+                <p className="mt-7 border-t-2 border-[#191919]/10 pt-4 text-xs text-[#7b7b7b]">Messages disappear after 24 hours.</p>
+              </section>
+            </div>
           </div>
         ) : (
           <div className={`mx-auto flex w-full max-w-4xl flex-col gap-4 px-3 py-6 sm:gap-5 sm:px-8 sm:py-10 ${allowed ? "pb-44 sm:pb-40" : "pb-32 sm:pb-28"}`}>
