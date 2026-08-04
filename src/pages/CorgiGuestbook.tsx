@@ -238,7 +238,7 @@ export default function CorgiGuestbook() {
       })
       if (response.status === 403) {
         sessionStorage.removeItem("corgi-geo")
-        window.location.replace("/corgi")
+        window.location.replace("/")
         return false
       }
       if (!response.ok) throw new Error("messages unavailable")
@@ -257,7 +257,7 @@ export default function CorgiGuestbook() {
   useEffect(() => {
     const savedName = localStorage.getItem("corgi-name") || ""
     if (!storedCoordinates() || !savedName.trim()) {
-      window.location.replace("/corgi")
+      window.location.replace("/")
       return
     }
     setName(savedName)
@@ -378,7 +378,7 @@ export default function CorgiGuestbook() {
       <header className="relative z-30 shrink-0 border-b-2 border-[#191919] bg-[#ff5c00] px-3 py-2.5 sm:px-6 sm:py-3">
         <div className="mx-auto flex w-full max-w-6xl items-center justify-between gap-3">
           <div className="flex min-w-0 items-center gap-3">
-            <a href="/corgi" aria-label="Back to Corgi landing" className="grid size-9 shrink-0 place-items-center rounded-full border-2 border-[#191919] bg-white text-[#191919] shadow-[0_3px_0_#191919] transition-transform hover:-translate-y-0.5 active:translate-y-[3px] active:shadow-none">
+            <a href="/" aria-label="Back to Corgi landing" className="grid size-9 shrink-0 place-items-center rounded-full border-2 border-[#191919] bg-white text-[#191919] shadow-[0_3px_0_#191919] transition-transform hover:-translate-y-0.5 active:translate-y-[3px] active:shadow-none">
               <ArrowLeft size={15} />
             </a>
             <div className="min-w-0">

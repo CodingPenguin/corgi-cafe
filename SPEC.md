@@ -5,7 +5,7 @@ A live chatroom for Corgi Cafe at 9 Claude Ln, San Francisco, deployed on Vercel
 ## Deliverables — write exactly these files in this directory
 
 1. `routes/api.ts` — Hono API route (deployed at `/api/corgi/:action`)
-2. `routes/chat.tsx` — React landing page (deployed at `/corgi`, public)
+2. `routes/chat.tsx` — Legacy React landing page (formerly deployed at `/corgi`)
 3. `routes/guestbook.tsx` — Legacy React chatroom route (formerly deployed at `/corgi/chat`)
 4. `routes/admin.tsx` — React page (deployed at `/corgi/admin`, private/owner-only)
 5. `README.md` — short: what it is, how presence works, how admin setup works
@@ -59,17 +59,17 @@ Actions:
 
 All responses are JSON via `c.json(...)`.
 
-## Landing page — `/corgi`
+## Landing page — `/`
 
-Preserve the full-bleed flying-corgi hero and link its primary call to action to `/corgi/chat`. The landing page has no chat transport or state.
+Preserve the full-bleed flying-corgi hero and link its primary call to action to `/chat`. The landing page has no chat transport or state.
 
-## Chatroom page — `/corgi/chat`
+## Chatroom page — `/chat`
 
 Full-screen live cafe chatroom with a warm paper surface, subtle grain, compact identity bar, accurate room count, chronological chat bubbles, and a floating composer. Secondary room details live behind one info icon; there is no welcome card or permanent sidebar.
 
 Behavior:
 - The landing page requests browser location and validates it through `GET /api/corgi/presence`. A successful check asks for a display name before entering the chatroom.
-- Direct visits without stored coordinates and a name return to `/corgi`. `GET /api/corgi/messages` also rejects out-of-range coordinates before returning history.
+- Direct visits without stored coordinates and a name return to `/`. `GET /api/corgi/messages` also rejects out-of-range coordinates before returning history.
 - Fetch `GET /api/corgi/messages` once for initial history and posting presence, then receive new messages through a Supabase Realtime WebSocket subscription. No rapid polling or post-send refetch.
 - Join the public `corgi-room` Presence channel with an anonymous browser ID and show the number of unique connected browsers as “N in the room.” This is chat viewership, not cafe occupancy.
 - Message list: name, text, and relative timestamp ("just now", "4m ago", "2h ago", else local time). Auto-scroll to newest only when the user is already near the bottom.

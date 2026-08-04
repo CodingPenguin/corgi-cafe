@@ -1,5 +1,5 @@
 User-agent: *
-Allow: /corgi$
-Disallow: /corgi/chat
+Allow: /$
+Disallow: /chat
 
 Sitemap: https://corgi-chat.vercel.app/sitemap.xml

@@ -1,9 +1,5 @@
 {
   "rewrites": [
-    { "source": "/corgi", "destination": "/index.html" },
-    { "source": "/corgi/chat", "destination": "/index.html" }
-  ],
-  "redirects": [
-    { "source": "/", "destination": "/corgi", "permanent": false }
+    { "source": "/chat", "destination": "/index.html" }
   ]
 }

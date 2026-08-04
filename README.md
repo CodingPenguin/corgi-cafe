@@ -1,10 +1,10 @@
 # Corgi Cafe Wall
 
-Corgi Cafe Wall is a location-gated live chatroom for Corgi Cafe at 9 Claude Ln. `/corgi` is the public landing page and `/corgi/chat` is available only after a successful location check from the cafe. The upcoming 2146 3rd St location appears on the landing page but does not pass the geogate yet. The UI uses Corgi Insurance's orange, ink, white, gray, and peach brand palette.
+Corgi Cafe Wall is a location-gated live chatroom for Corgi Cafe at 9 Claude Ln. `/` is the public landing page and `/chat` is available only after a successful location check from the cafe. The upcoming 2146 3rd St location appears on the landing page but does not pass the geogate yet. The UI uses Corgi Insurance's orange, ink, white, gray, and peach brand palette.
 
 ## Deployments
 
-- Vercel: https://corgi-chat.vercel.app/corgi
+- Vercel: https://corgi-chat.vercel.app/
 The root Vite app and `api/corgi/[action].ts` are the production deployment. The standalone files under `routes/` retain the former Zo Space implementation for reference; all Corgi routes and assets were removed from Zo Space on August 2, 2026.
 
 ## Realtime chat

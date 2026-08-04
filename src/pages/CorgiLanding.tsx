@@ -54,7 +54,7 @@ export default function CorgiLanding() {
       return
     }
     localStorage.setItem("corgi-name", cleanName.slice(0, 30))
-    window.location.assign("/corgi/chat")
+    window.location.assign("/chat")
   }
 
   const style = {

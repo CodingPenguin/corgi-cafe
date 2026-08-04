@@ -5,7 +5,7 @@ import CorgiGuestbook from "./pages/CorgiGuestbook"
 import "./index.css"
 
 const path = window.location.pathname.replace(/\/$/, "") || "/"
-const Page = path === "/corgi/chat" ? CorgiGuestbook : CorgiLanding
+const Page = path === "/chat" ? CorgiGuestbook : CorgiLanding
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
