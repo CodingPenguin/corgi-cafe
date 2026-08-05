@@ -8,6 +8,7 @@ const theme = {
 
 export default function CorgiLanding() {
   const [gateState, setGateState] = useState<"idle" | "checking" | "name" | "outside" | "denied" | "error">("idle")
+  const [ownerAccess, setOwnerAccess] = useState(false)
   const [name, setName] = useState("")
   const nameRef = useRef<HTMLInputElement>(null)
 
@@ -31,11 +32,23 @@ export default function CorgiLanding() {
       return
     }
     sessionStorage.setItem("corgi-geo", JSON.stringify(coordinates))
+    setOwnerAccess(false)
     setGateState("name")
   }
 
-  function checkLocation() {
+  async function checkLocation() {
     setGateState("checking")
+    try {
+      const response = await fetch("/api/corgi/presence", { headers: { Accept: "application/json" } })
+      if (response.ok) {
+        const data = await response.json() as { presence: { allowed: boolean }; ownerAccess?: boolean }
+        if (data.presence.allowed) {
+          setOwnerAccess(Boolean(data.ownerAccess))
+          setGateState("name")
+          return
+        }
+      }
+    } catch {}
     if (!navigator.geolocation) {
       setGateState("error")
       return
@@ -94,7 +107,7 @@ export default function CorgiLanding() {
             <div className="mt-6 flex flex-col items-start gap-4 sm:mt-9">
               <button
                 type="button"
-                onClick={checkLocation}
+                onClick={() => void checkLocation()}
                 className="group inline-flex min-h-12 items-center gap-2.5 rounded-full bg-[#241a12] px-6 text-sm font-black text-white shadow-[0_12px_28px_rgba(36,26,18,0.22)] transition hover:-translate-y-1 hover:shadow-[0_16px_32px_rgba(36,26,18,0.25)] active:translate-y-0 sm:min-h-14 sm:gap-3 sm:px-7 sm:text-base"
               >
                 Join the chat
@@ -118,10 +131,10 @@ export default function CorgiLanding() {
           <section role="dialog" aria-modal="true" aria-labelledby="gate-title" className="relative w-full max-w-md rounded-[28px] border-2 border-[#241a12] bg-white p-6 text-[#241a12] shadow-[0_10px_0_#241a12,0_30px_80px_rgba(36,26,18,0.3)] sm:p-8">
             {gateState !== "checking" && <button type="button" onClick={() => setGateState("idle")} aria-label="Close" className="absolute right-4 top-4 grid size-9 place-items-center rounded-full hover:bg-black/5"><X size={18} /></button>}
             {gateState === "checking" && <><LoaderCircle className="size-9 animate-spin text-[var(--corgi-accent)]" /><h2 id="gate-title" className="mt-5 text-3xl font-black tracking-[-0.04em]">Checking your location</h2><p className="mt-2 text-sm leading-6 text-[#241a12]/65">Allow location access so we can confirm you’re at Corgi Cafe.</p></>}
-            {gateState === "name" && <form onSubmit={(event) => { event.preventDefault(); enterChat() }}><span className="inline-flex items-center gap-2 rounded-full bg-[#e8f7ed] px-3 py-1.5 text-xs font-bold text-[#18733a]"><span className="size-2 rounded-full bg-[#24a052]" />You’re at Corgi</span><h2 id="gate-title" className="mt-5 text-3xl font-black tracking-[-0.04em]">What should we call you?</h2><label className="mt-5 block text-xs font-bold uppercase tracking-[0.08em]" htmlFor="corgi-name">Your name</label><input ref={nameRef} id="corgi-name" value={name} onChange={(event) => setName(event.target.value)} maxLength={30} required placeholder="Danny" className="mt-2 h-13 w-full rounded-xl border-2 border-[#241a12] px-4 text-base outline-none focus:ring-4 focus:ring-[var(--corgi-peach)]" /><button type="submit" className="mt-4 flex h-13 w-full items-center justify-center gap-2 rounded-xl border-2 border-[#241a12] bg-[var(--corgi-accent)] font-black text-white shadow-[0_5px_0_#241a12] active:translate-y-[5px] active:shadow-none">Enter the chat <ArrowRight size={18} /></button></form>}
-            {gateState === "outside" && <><MapPin className="size-9 text-[var(--corgi-accent)]" /><h2 id="gate-title" className="mt-5 text-3xl font-black tracking-[-0.04em]">This chatroom lives at Corgi</h2><p className="mt-2 text-sm leading-6 text-[#241a12]/65">You need to be at 9 Claude Lane to enter. If you’re already there, move closer to a window and try again.</p><button type="button" onClick={checkLocation} className="mt-5 h-12 w-full rounded-xl border-2 border-[#241a12] bg-[var(--corgi-accent)] font-black text-white shadow-[0_5px_0_#241a12] active:translate-y-[5px] active:shadow-none">Try again</button></>}
-            {gateState === "denied" && <><MapPin className="size-9 text-[var(--corgi-accent)]" /><h2 id="gate-title" className="mt-5 text-3xl font-black tracking-[-0.04em]">Location access is off</h2><p className="mt-2 text-sm leading-6 text-[#241a12]/65">Enable location for this site in your browser settings, then try again.</p><button type="button" onClick={checkLocation} className="mt-5 h-12 w-full rounded-xl border-2 border-[#241a12] bg-[var(--corgi-accent)] font-black text-white shadow-[0_5px_0_#241a12] active:translate-y-[5px] active:shadow-none">Try again</button></>}
-            {gateState === "error" && <><MapPin className="size-9 text-[var(--corgi-accent)]" /><h2 id="gate-title" className="mt-5 text-3xl font-black tracking-[-0.04em]">We couldn’t check your location</h2><p className="mt-2 text-sm leading-6 text-[#241a12]/65">Check your connection and location settings, then give it another try.</p><button type="button" onClick={checkLocation} className="mt-5 h-12 w-full rounded-xl border-2 border-[#241a12] bg-[var(--corgi-accent)] font-black text-white shadow-[0_5px_0_#241a12] active:translate-y-[5px] active:shadow-none">Try again</button></>}
+            {gateState === "name" && <form onSubmit={(event) => { event.preventDefault(); enterChat() }}><span className="inline-flex items-center gap-2 rounded-full bg-[#e8f7ed] px-3 py-1.5 text-xs font-bold text-[#18733a]"><span className="size-2 rounded-full bg-[#24a052]" />{ownerAccess ? "Creator access" : "You’re at Corgi"}</span><h2 id="gate-title" className="mt-5 text-3xl font-black tracking-[-0.04em]">What should we call you?</h2><label className="mt-5 block text-xs font-bold uppercase tracking-[0.08em]" htmlFor="corgi-name">Your name</label><input ref={nameRef} id="corgi-name" value={name} onChange={(event) => setName(event.target.value)} maxLength={30} required placeholder="Danny" className="mt-2 h-13 w-full rounded-xl border-2 border-[#241a12] px-4 text-base outline-none focus:ring-4 focus:ring-[var(--corgi-peach)]" /><button type="submit" className="mt-4 flex h-13 w-full items-center justify-center gap-2 rounded-xl border-2 border-[#241a12] bg-[var(--corgi-accent)] font-black text-white shadow-[0_5px_0_#241a12] active:translate-y-[5px] active:shadow-none">Enter the chat <ArrowRight size={18} /></button></form>}
+            {gateState === "outside" && <><MapPin className="size-9 text-[var(--corgi-accent)]" /><h2 id="gate-title" className="mt-5 text-3xl font-black tracking-[-0.04em]">This chatroom lives at Corgi</h2><p className="mt-2 text-sm leading-6 text-[#241a12]/65">You need to be at 9 Claude Lane to enter. If you’re already there, move closer to a window and try again.</p><button type="button" onClick={() => void checkLocation()} className="mt-5 h-12 w-full rounded-xl border-2 border-[#241a12] bg-[var(--corgi-accent)] font-black text-white shadow-[0_5px_0_#241a12] active:translate-y-[5px] active:shadow-none">Try again</button></>}
+            {gateState === "denied" && <><MapPin className="size-9 text-[var(--corgi-accent)]" /><h2 id="gate-title" className="mt-5 text-3xl font-black tracking-[-0.04em]">Location access is off</h2><p className="mt-2 text-sm leading-6 text-[#241a12]/65">Enable location for this site in your browser settings, then try again.</p><button type="button" onClick={() => void checkLocation()} className="mt-5 h-12 w-full rounded-xl border-2 border-[#241a12] bg-[var(--corgi-accent)] font-black text-white shadow-[0_5px_0_#241a12] active:translate-y-[5px] active:shadow-none">Try again</button></>}
+            {gateState === "error" && <><MapPin className="size-9 text-[var(--corgi-accent)]" /><h2 id="gate-title" className="mt-5 text-3xl font-black tracking-[-0.04em]">We couldn’t check your location</h2><p className="mt-2 text-sm leading-6 text-[#241a12]/65">Check your connection and location settings, then give it another try.</p><button type="button" onClick={() => void checkLocation()} className="mt-5 h-12 w-full rounded-xl border-2 border-[#241a12] bg-[var(--corgi-accent)] font-black text-white shadow-[0_5px_0_#241a12] active:translate-y-[5px] active:shadow-none">Try again</button></>}
           </section>
         </div>
       )}

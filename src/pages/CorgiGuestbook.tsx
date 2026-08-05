@@ -259,7 +259,7 @@ export default function CorgiGuestbook() {
 
   useEffect(() => {
     const savedName = localStorage.getItem("corgi-name") || ""
-    if (!storedCoordinates() || !savedName.trim()) {
+    if (!savedName.trim()) {
       window.location.replace("/")
       return
     }

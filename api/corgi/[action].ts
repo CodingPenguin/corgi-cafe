@@ -130,6 +130,11 @@ function isCreatorRequest(request: VercelRequest): boolean {
   }
 }
 
+function requestPresence(request: VercelRequest, lat: number | null, lng: number | null) {
+  if (isCreatorRequest(request)) return { allowed: true, via: "geo" as const }
+  return presence(lat, lng)
+}
+
 function supabaseHeaders(key: string, extra: Record<string, string> = {}) {
   return { apikey: key, Authorization: `Bearer ${key}`, ...extra }
 }
@@ -205,13 +210,17 @@ export default async function handler(request: VercelRequest, response: VercelRe
   }
 
   if (action === "presence" && request.method === "GET") {
+    const ownerAccess = isCreatorRequest(request)
     return response.status(200).json({
-      presence: presence(numeric(request.query.lat), numeric(request.query.lng)),
+      presence: ownerAccess
+        ? { allowed: true, via: "geo" as const }
+        : presence(numeric(request.query.lat), numeric(request.query.lng)),
+      ownerAccess,
     })
   }
 
   if (action === "messages" && request.method === "GET") {
-    const currentPresence = presence(numeric(request.query.lat), numeric(request.query.lng))
+    const currentPresence = requestPresence(request, numeric(request.query.lat), numeric(request.query.lng))
     if (!currentPresence.allowed) {
       return response.status(403).json({ error: "not-at-cafe" })
     }
@@ -233,7 +242,7 @@ export default async function handler(request: VercelRequest, response: VercelRe
       ? request.body as Record<string, unknown>
       : null
     if (!body) return response.status(400).json({ error: "invalid-body" })
-    const currentPresence = presence(numeric(body.lat), numeric(body.lng))
+    const currentPresence = requestPresence(request, numeric(body.lat), numeric(body.lng))
     if (!currentPresence.allowed || !currentPresence.via) {
       return response.status(403).json({ error: "not-at-cafe" })
     }
