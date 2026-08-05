@@ -158,7 +158,9 @@ export default async function handler(request: VercelRequest, response: VercelRe
   }
 
   if (action === "messages" && request.method === "POST") {
-    const body = request.body && typeof request.body === "object" ? request.body : null
+    const body = request.body && typeof request.body === "object"
+      ? request.body as Record<string, unknown>
+      : null
     if (!body) return response.status(400).json({ error: "invalid-body" })
     const currentPresence = presence(numeric(body.lat), numeric(body.lng))
     if (!currentPresence.allowed || !currentPresence.via) {
