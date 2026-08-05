@@ -22,6 +22,7 @@ type Message = {
   text: string
   ts: number
   via: "wifi" | "geo"
+  senderId: string | null
   pending?: boolean
   failed?: boolean
 }
@@ -32,6 +33,7 @@ type SupabaseMessage = {
   text: string
   created_at: string
   via: "wifi" | "geo"
+  sender_id: string | null
 }
 
 type MessagesResponse = {
@@ -58,13 +60,12 @@ function storedCoordinates(): Coordinates | null {
   }
 }
 
-function sessionId(): string {
-  const existing = sessionStorage.getItem("corgi-session-id")
+function browserId(): string {
+  const existing = localStorage.getItem("corgi-browser-id")
   if (existing) return existing
-  const browserId = localStorage.getItem("corgi-browser-id") || crypto.randomUUID()
-  localStorage.setItem("corgi-browser-id", browserId)
-  sessionStorage.setItem("corgi-session-id", browserId)
-  return browserId
+  const created = crypto.randomUUID()
+  localStorage.setItem("corgi-browser-id", created)
+  return created
 }
 
 function mergeMessages(current: Message[], incoming: Message[]): Message[] {
@@ -269,7 +270,7 @@ export default function CorgiGuestbook() {
       if (!inRange || cancelled) return
       supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
       channel = supabase.channel("corgi-room", {
-        config: { presence: { key: sessionId() } },
+        config: { presence: { key: browserId() } },
       })
         .on(
           "postgres_changes",
@@ -282,6 +283,7 @@ export default function CorgiGuestbook() {
               text: row.text,
               ts: new Date(row.created_at).getTime(),
               via: row.via,
+              senderId: row.sender_id,
             }]))
           },
         )
@@ -314,7 +316,7 @@ export default function CorgiGuestbook() {
       const response = await fetch("/api/corgi/messages", {
         method: "POST",
         headers: { Accept: "application/json", "Content-Type": "application/json" },
-        body: JSON.stringify({ name: messageName, text: messageText, ...coordinates }),
+        body: JSON.stringify({ name: messageName, text: messageText, senderId: browserId(), ...coordinates }),
       })
       if (!response.ok) throw new Error("send failed")
       const data = (await response.json()) as SendResponse
@@ -342,6 +344,7 @@ export default function CorgiGuestbook() {
       text: cleanText,
       ts: Date.now(),
       via: "geo",
+      senderId: browserId(),
       pending: true,
     }]))
     setText("")
@@ -419,7 +422,7 @@ export default function CorgiGuestbook() {
         ) : (
           <div className={`mx-auto flex w-full max-w-4xl flex-col gap-4 px-3 py-6 sm:gap-5 sm:px-8 sm:py-10 ${allowed ? "pb-44 sm:pb-40" : "pb-32 sm:pb-28"}`}>
             {messages.map((message) => {
-              const mine = mineRef.current.has(message.id)
+              const mine = message.senderId === browserId() || mineRef.current.has(message.id)
               return (
                 <article key={message.id} className={`min-w-48 w-fit max-w-[92%] px-5 py-4 sm:min-w-64 sm:max-w-[78%] sm:px-6 sm:py-5 ${mine ? "self-end rounded-[24px] rounded-br-md border-2 border-[#191919] bg-[#ff5c00] text-white shadow-[0_9px_0_#191919,0_16px_30px_rgba(25,25,25,0.18)]" : "self-start rounded-[24px] rounded-bl-md border-2 border-[#191919] bg-white shadow-[0_9px_0_#191919,0_16px_30px_rgba(25,25,25,0.14)]"} ${message.pending ? "opacity-60" : "opacity-100"}`}>
                   <div className="flex min-w-0 flex-wrap items-center gap-x-1.5 gap-y-1">

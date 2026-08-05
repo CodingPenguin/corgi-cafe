@@ -23,6 +23,7 @@ type Message = {
   text: string
   ts: number
   via: "wifi" | "geo"
+  senderId: string | null
 }
 
 type SupabaseMessage = {
@@ -31,6 +32,7 @@ type SupabaseMessage = {
   text: string
   created_at: string
   via: "wifi" | "geo"
+  sender_id: string | null
 }
 
 const lastPosts = new Map<string, number>()
@@ -81,7 +83,7 @@ function supabaseHeaders(key: string, extra: Record<string, string> = {}) {
 
 async function fetchMessages(key: string): Promise<Message[]> {
   const query = new URLSearchParams({
-    select: "id,name,text,created_at,via",
+    select: "id,name,text,created_at,via,sender_id",
     created_at: `gte.${new Date(Date.now() - 86_400_000).toISOString()}`,
     order: "created_at.desc",
     limit: "100",
@@ -97,6 +99,7 @@ async function fetchMessages(key: string): Promise<Message[]> {
     text: row.text,
     ts: new Date(row.created_at).getTime(),
     via: row.via,
+    senderId: row.sender_id,
   }))
 }
 
@@ -110,6 +113,7 @@ async function insertMessage(key: string, message: Message): Promise<void> {
       text: message.text,
       created_at: new Date(message.ts).toISOString(),
       via: message.via,
+      sender_id: message.senderId,
     }),
   })
   if (!response.ok) throw new Error("supabase-insert-failed")
@@ -163,6 +167,10 @@ export default async function handler(request: VercelRequest, response: VercelRe
     const text = typeof body.text === "string" ? body.text.trim() : ""
     const suppliedName = typeof body.name === "string" ? body.name.trim() : ""
     const name = suppliedName || "Anonymous Corgi"
+    const suppliedSenderId = typeof body.senderId === "string" ? body.senderId.trim() : ""
+    const senderId = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(suppliedSenderId)
+      ? suppliedSenderId
+      : null
     if (!text || text.length > 500 || name.length > 30) {
       return response.status(400).json({ error: "invalid-message" })
     }
@@ -172,7 +180,7 @@ export default async function handler(request: VercelRequest, response: VercelRe
       return response.status(429).json({ error: "too-fast" })
     }
     lastPosts.set(ip, now)
-    const message: Message = { id: randomUUID(), name, text, ts: now, via: currentPresence.via }
+    const message: Message = { id: randomUUID(), name, text, ts: now, via: currentPresence.via, senderId }
     const key = serviceRoleKey()
     if (!key) return response.status(503).json({ error: "message-service-unavailable" })
     try {

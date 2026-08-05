@@ -50,7 +50,7 @@ Presence check (given optional lat/lng from client):
 Actions:
 
 - `GET messages` (query params: `lat`, `lng` optional) → `{ "messages": [last 100, oldest first], "presence": { "allowed": boolean, "via": "wifi" | "geo" | null }, "configured": true }`. `configured` remains for API compatibility and is always true because the default location exists.
-- `POST messages` body `{ name, text, lat?, lng? }` → run presence check; if not allowed return 403 `{ "error": "not-at-cafe" }`. Validate: text non-empty after trim, ≤ 500 chars; name trimmed, default "Anonymous Corgi", ≤ 30 chars. Rate limit: in-memory Map of IP → last post ts, reject < 2000ms apart with 429 `{ "error": "too-fast" }`. On success insert into Supabase (id = crypto.randomUUID()), return `{ "ok": true, "message": <the message> }`, and opportunistically remove messages older than 24 hours.
+- `POST messages` body `{ name, text, senderId?, lat?, lng? }` → run presence check; if not allowed return 403 `{ "error": "not-at-cafe" }`. Validate: text non-empty after trim, ≤ 500 chars; name trimmed, default "Anonymous Corgi", ≤ 30 chars; senderId must be a UUID when present. Rate limit: in-memory Map of IP → last post ts, reject < 2000ms apart with 429 `{ "error": "too-fast" }`. On success insert into Supabase (id = crypto.randomUUID()), return `{ "ok": true, "message": <the message> }`, and opportunistically remove messages older than 24 hours.
 - `GET config` → `{ "claimed": boolean, "networkCount": number, "location": { lat, lng, radiusM, isDefault }, "envSecret": boolean }`, using the effective location (no secrets/IPs leaked).
 - `POST admin` body `{ secret, op, lat?, lng?, radiusM? }`:
   - Auth: if env `CORGI_ADMIN_SECRET` is set, `secret` must equal it. Otherwise first-claim: if `adminHash` is null, hash `secret` (min 6 chars) and store it (this claims admin); else sha256(secret) must equal `adminHash`. Wrong secret → 401 `{ "error": "bad-secret" }`.
@@ -74,6 +74,7 @@ Behavior:
 - Join the public `corgi-room` Presence channel with an anonymous browser ID and show the number of unique connected browsers as “N in the room.” This is chat viewership, not cafe occupancy.
 - Message list: name, text, and relative timestamp ("just now", "4m ago", "2h ago", else local time). Auto-scroll to newest only when the user is already near the bottom.
 - The composer is available only after the landing gate succeeds. The display name persists in localStorage `corgi-name` and is not repeated in the composer. The composer contains one message field plus send, while Markdown rendering remains an unadvertised capability. Enter sends, Shift+Enter adds a line break, and mobile form text stays at 16px or larger to prevent iOS focus zoom.
+- A random anonymous browser ID persists in localStorage `corgi-browser-id` and is stored with new messages so the sender's bubbles remain orange and right-aligned after refreshes and later visits from the same browser. There are no accounts, and another browser or device receives a different identity.
 - User-facing chat copy never mentions Wi-Fi.
 - Handle fetch errors quietly (keep last known state, small "reconnecting…" hint).
 - Empty state: a substantial left-aligned chat bubble with the headline "Quiet in here.", supporting copy "Be the first to say hi.", and understated metadata "Messages disappear after 24 hours."
