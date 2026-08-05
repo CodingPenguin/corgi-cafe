@@ -1,5 +1,6 @@
 .DS_Store
 node_modules/
+supabase/.temp/
 
 # Local exports and accidental browser output
 --full-page

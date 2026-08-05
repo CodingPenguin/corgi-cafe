@@ -1,4 +1,4 @@
-import { randomUUID } from "node:crypto"
+import { createHmac, randomUUID, timingSafeEqual } from "node:crypto"
 
 type VercelRequest = {
   method?: string
@@ -24,6 +24,7 @@ type Message = {
   ts: number
   via: "wifi" | "geo"
   senderId: string | null
+  isCreator: boolean
 }
 
 type SupabaseMessage = {
@@ -33,6 +34,7 @@ type SupabaseMessage = {
   created_at: string
   via: "wifi" | "geo"
   sender_id: string | null
+  is_creator: boolean
 }
 
 const lastPosts = new Map<string, number>()
@@ -77,13 +79,64 @@ function serviceRoleKey(): string | null {
   return process.env.SUPABASE_CORGI_SERVICE_ROLE_KEY?.trim() || null
 }
 
+function creatorClaimSecret(): string | null {
+  return process.env.CORGI_CREATOR_CLAIM_SECRET?.trim() || null
+}
+
+function creatorCookieSecret(): string | null {
+  return process.env.CORGI_CREATOR_COOKIE_SECRET?.trim() || null
+}
+
+function firstHeader(value: string | string[] | undefined): string {
+  if (Array.isArray(value)) return value[0] || ""
+  return value || ""
+}
+
+function secureEqual(left: string, right: string): boolean {
+  const leftBuffer = Buffer.from(left)
+  const rightBuffer = Buffer.from(right)
+  return leftBuffer.length === rightBuffer.length && timingSafeEqual(leftBuffer, rightBuffer)
+}
+
+function signCreatorCookie(secret: string): string {
+  const payload = Buffer.from(JSON.stringify({
+    role: "creator",
+    exp: Date.now() + 365 * 24 * 60 * 60 * 1000,
+    nonce: randomUUID(),
+  })).toString("base64url")
+  const signature = createHmac("sha256", secret).update(payload).digest("base64url")
+  return `${payload}.${signature}`
+}
+
+function isCreatorRequest(request: VercelRequest): boolean {
+  const secret = creatorCookieSecret()
+  if (!secret) return false
+  const cookies = firstHeader(request.headers.cookie).split(";")
+  const value = cookies
+    .map((cookie) => cookie.trim().split("="))
+    .find(([name]) => name === "corgi_creator")
+    ?.slice(1)
+    .join("=")
+  if (!value) return false
+  const [payload, signature, ...extra] = value.split(".")
+  if (!payload || !signature || extra.length) return false
+  const expected = createHmac("sha256", secret).update(payload).digest("base64url")
+  if (!secureEqual(signature, expected)) return false
+  try {
+    const parsed = JSON.parse(Buffer.from(payload, "base64url").toString("utf8")) as { role?: unknown; exp?: unknown }
+    return parsed.role === "creator" && typeof parsed.exp === "number" && parsed.exp > Date.now()
+  } catch {
+    return false
+  }
+}
+
 function supabaseHeaders(key: string, extra: Record<string, string> = {}) {
   return { apikey: key, Authorization: `Bearer ${key}`, ...extra }
 }
 
 async function fetchMessages(key: string): Promise<Message[]> {
   const query = new URLSearchParams({
-    select: "id,name,text,created_at,via,sender_id",
+    select: "id,name,text,created_at,via,sender_id,is_creator",
     created_at: `gte.${new Date(Date.now() - 86_400_000).toISOString()}`,
     order: "created_at.desc",
     limit: "100",
@@ -100,6 +153,7 @@ async function fetchMessages(key: string): Promise<Message[]> {
     ts: new Date(row.created_at).getTime(),
     via: row.via,
     senderId: row.sender_id,
+    isCreator: row.is_creator,
   }))
 }
 
@@ -114,6 +168,7 @@ async function insertMessage(key: string, message: Message): Promise<void> {
       created_at: new Date(message.ts).toISOString(),
       via: message.via,
       sender_id: message.senderId,
+      is_creator: message.isCreator,
     }),
   })
   if (!response.ok) throw new Error("supabase-insert-failed")
@@ -132,6 +187,22 @@ async function deleteExpiredMessages(key: string): Promise<void> {
 export default async function handler(request: VercelRequest, response: VercelResponse) {
   response.setHeader("Cache-Control", "no-store")
   const action = Array.isArray(request.query.action) ? request.query.action[0] : request.query.action
+
+  if (action === "claim" && request.method === "GET") {
+    response.setHeader("Referrer-Policy", "no-referrer")
+    const suppliedToken = Array.isArray(request.query.token) ? request.query.token[0] : request.query.token
+    const claimSecret = creatorClaimSecret()
+    const cookieSecret = creatorCookieSecret()
+    if (!claimSecret || !cookieSecret || typeof suppliedToken !== "string" || !secureEqual(suppliedToken, claimSecret)) {
+      return response.status(404).json({ error: "not-found" })
+    }
+    response.setHeader(
+      "Set-Cookie",
+      `corgi_creator=${signCreatorCookie(cookieSecret)}; Path=/; Max-Age=31536000; HttpOnly; Secure; SameSite=Strict`,
+    )
+    response.setHeader("Location", "/chat")
+    return response.status(302).json({ ok: true })
+  }
 
   if (action === "presence" && request.method === "GET") {
     return response.status(200).json({
@@ -182,7 +253,15 @@ export default async function handler(request: VercelRequest, response: VercelRe
       return response.status(429).json({ error: "too-fast" })
     }
     lastPosts.set(ip, now)
-    const message: Message = { id: randomUUID(), name, text, ts: now, via: currentPresence.via, senderId }
+    const message: Message = {
+      id: randomUUID(),
+      name,
+      text,
+      ts: now,
+      via: currentPresence.via,
+      senderId,
+      isCreator: isCreatorRequest(request),
+    }
     const key = serviceRoleKey()
     if (!key) return response.status(503).json({ error: "message-service-unavailable" })
     try {
