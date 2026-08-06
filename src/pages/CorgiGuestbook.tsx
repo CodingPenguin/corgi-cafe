@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from "react"
-import { ArrowLeft, Crown, Info, Send, X } from "lucide-react"
+import { ArrowLeft, Crown, Info, Send, Timer, X } from "lucide-react"
 import { createClient } from "@supabase/supabase-js"
 
 const SUPABASE_URL = "https://zjwuybogjgljeueurffg.supabase.co"
@@ -215,6 +215,15 @@ function relativeTime(timestamp: number): string {
   return new Date(timestamp).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" })
 }
 
+function formatElapsedTime(elapsed: number): string {
+  const totalSeconds = Math.floor(elapsed / 1_000)
+  const seconds = String(totalSeconds % 60).padStart(2, "0")
+  const totalMinutes = Math.floor(totalSeconds / 60)
+  if (totalMinutes < 60) return `${totalMinutes}:${seconds}`
+  const minutes = String(totalMinutes % 60).padStart(2, "0")
+  return `${Math.floor(totalMinutes / 60)}:${minutes}:${seconds}`
+}
+
 export default function CorgiGuestbook() {
   const [messages, setMessages] = useState<Message[]>([])
   const [allowed, setAllowed] = useState(false)
@@ -224,6 +233,8 @@ export default function CorgiGuestbook() {
   const [text, setText] = useState("")
   const [viewerCount, setViewerCount] = useState(0)
   const [infoOpen, setInfoOpen] = useState(false)
+  const [checkinTimestamp, setCheckinTimestamp] = useState<number | null>(null)
+  const [elapsedTime, setElapsedTime] = useState(0)
   const listRef = useRef<HTMLDivElement>(null)
   const nearBottomRef = useRef(true)
   const mineRef = useRef(new Set<string>())
@@ -313,6 +324,27 @@ export default function CorgiGuestbook() {
     }
   }, [messages])
 
+  useEffect(() => {
+    if (!allowed) {
+      setCheckinTimestamp(null)
+      setElapsedTime(0)
+      return
+    }
+
+    const storedValue = sessionStorage.getItem("corgi-checkin-ts")
+    let timestamp = storedValue === null || storedValue.trim() === "" ? Number.NaN : Number(storedValue)
+    if (!Number.isFinite(timestamp)) {
+      timestamp = Date.now()
+      sessionStorage.setItem("corgi-checkin-ts", String(timestamp))
+    }
+    setCheckinTimestamp(timestamp)
+
+    const updateElapsedTime = () => setElapsedTime(Math.max(0, Date.now() - timestamp))
+    updateElapsedTime()
+    const interval = window.setInterval(updateElapsedTime, 1_000)
+    return () => window.clearInterval(interval)
+  }, [allowed])
+
   async function postMessage(localId: string, messageName: string, messageText: string) {
     try {
       const coordinates = storedCoordinates()
@@ -383,7 +415,7 @@ export default function CorgiGuestbook() {
     <main style={style} className="flex h-dvh min-h-dvh w-full flex-col overflow-hidden bg-[#f6f6f6] text-[#191919] selection:bg-[#ff5c00]/20">
       <style>{`@import url('https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&display=swap');`}</style>
       <header className="relative z-30 shrink-0 border-b-2 border-[#191919] bg-[#ff5c00] px-3 py-2.5 sm:px-6 sm:py-3">
-        <div className="mx-auto flex w-full max-w-6xl items-center justify-between gap-3">
+        <div className="mx-auto flex w-full max-w-6xl items-center justify-between gap-2 sm:gap-3">
           <div className="flex min-w-0 items-center gap-3">
             <a href="/" aria-label="Back to Corgi landing" className="grid size-9 shrink-0 place-items-center rounded-full border-2 border-[#191919] bg-white text-[#191919] shadow-[0_3px_0_#191919] transition-transform hover:-translate-y-0.5 active:translate-y-[3px] active:shadow-none">
               <ArrowLeft size={15} />
@@ -392,10 +424,16 @@ export default function CorgiGuestbook() {
               <h1 className="truncate text-xl font-bold leading-none tracking-[-0.04em] text-white sm:text-2xl">Corgi Chat</h1>
             </div>
           </div>
-          <div className="flex shrink-0 items-center gap-2.5 sm:gap-3">
+          <div className="flex shrink-0 items-center gap-2 sm:gap-3">
+            {allowed && checkinTimestamp !== null ? (
+              <span className="inline-flex items-center gap-1.5 whitespace-nowrap rounded-full border-2 border-[#191919] bg-white px-2.5 py-1.5 text-[11px] font-semibold text-[#191919] shadow-[0_3px_0_#191919] sm:px-3 sm:text-xs">
+                <Timer size={13} color="#ff5c00" />
+                <span><span className="hidden sm:inline">Locked in · </span>{formatElapsedTime(elapsedTime)}</span>
+              </span>
+            ) : null}
             <span className="inline-flex items-center gap-1.5 whitespace-nowrap rounded-full border-2 border-[#191919] bg-white px-2.5 py-1.5 text-[11px] font-semibold text-[#191919] shadow-[0_3px_0_#191919] sm:px-3 sm:text-xs">
               <span className={`size-1.5 rounded-full ${reconnecting ? "bg-amber-500" : "bg-emerald-600"}`} />
-              <span className="hidden sm:inline">Live · </span>{viewerCount} in the room
+              <span className="hidden sm:inline">Live · </span>{viewerCount}<span className="hidden sm:inline"> in the room</span>
             </span>
             <button type="button" onClick={() => setInfoOpen(true)} aria-label="About this chatroom" className="grid size-9 place-items-center rounded-full border-2 border-[#191919] bg-white text-[#191919] shadow-[0_3px_0_#191919] transition-transform hover:-translate-y-0.5 active:translate-y-[3px] active:shadow-none">
               <Info size={15} />

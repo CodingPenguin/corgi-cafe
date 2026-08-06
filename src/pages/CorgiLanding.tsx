@@ -32,6 +32,9 @@ export default function CorgiLanding() {
       return
     }
     sessionStorage.setItem("corgi-geo", JSON.stringify(coordinates))
+    if (!sessionStorage.getItem("corgi-checkin-ts")) {
+      sessionStorage.setItem("corgi-checkin-ts", String(Date.now()))
+    }
     setOwnerAccess(false)
     setGateState("name")
   }
